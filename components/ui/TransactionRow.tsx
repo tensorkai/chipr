@@ -146,7 +146,7 @@ export function TransactionRow({
 
             {/* Tax Deductible Badge */}
             {isTaxDeductible && (
-              <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
+              <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 text-caption font-bold text-emerald-700 dark:text-emerald-300">
                 <TaxIcon className="w-2.5 h-2.5" />
                 <span>Write-off</span>
               </span>
@@ -154,20 +154,20 @@ export function TransactionRow({
 
             {/* Owner Draw Badge */}
             {isOwnerDraw && (
-              <span className="inline-flex items-center rounded-md bg-purple-50 dark:bg-purple-950/40 px-1.5 py-0.5 text-[10px] font-bold text-purple-700 dark:text-purple-300">
+              <span className="inline-flex items-center rounded-md bg-purple-50 dark:bg-purple-950/40 px-1.5 py-0.5 text-caption font-bold text-purple-700 dark:text-purple-300">
                 Owner Draw
               </span>
             )}
 
             {/* Anti-Commingling Reimbursement Badge */}
             {reimbursementStatus === "pending" && (
-              <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 dark:bg-amber-950/40 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-300">
+              <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 dark:bg-amber-950/40 px-1.5 py-0.5 text-caption font-bold text-amber-700 dark:text-amber-300">
                 Reimbursement Due
               </span>
             )}
 
             {reimbursementStatus === "reimbursed" && (
-              <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-[10px] font-bold text-slate-600 dark:text-slate-400">
+              <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-caption font-bold text-slate-600 dark:text-slate-400">
                 <CheckCircleIcon className="w-3 h-3 text-emerald-500" />
                 Reimbursed
               </span>
@@ -179,11 +179,11 @@ export function TransactionRow({
             {accountName && (
               <>
                 <span>•</span>
-                <span className="truncate max-w-[140px] font-mono text-[11px]">{accountName}</span>
+                <span className="truncate max-w-[140px] font-mono text-caption">{accountName}</span>
               </>
             )}
             <span>•</span>
-            <span className="shrink-0 font-mono text-[11px]">{date}</span>
+            <span className="shrink-0 font-mono text-caption">{date}</span>
             {note && (
               <>
                 <span>•</span>
@@ -218,7 +218,7 @@ export function TransactionRow({
                 e.stopPropagation();
                 onReimburse();
               }}
-              className="text-[11px] font-bold text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/60 cursor-pointer py-1 px-2 rounded-lg bg-amber-50 dark:bg-amber-950/50 border border-amber-500/20 transition-colors"
+              className="text-caption font-bold text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/60 cursor-pointer py-1 px-2 rounded-lg bg-amber-50 dark:bg-amber-950/50 border border-amber-500/20 transition-colors"
             >
               Reimburse
             </button>

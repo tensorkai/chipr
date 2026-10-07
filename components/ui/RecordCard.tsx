@@ -157,7 +157,7 @@ export function RecordCard({
             <p className="text-xs font-semibold text-text-primary truncate">
               {merchant}
             </p>
-            <div className="flex items-center gap-1.5 text-[10px] text-text-muted font-mono">
+            <div className="flex items-center gap-1.5 text-caption text-text-muted font-mono">
               <span>{category}</span>
               <span>•</span>
               <span>{date}</span>
@@ -202,11 +202,11 @@ export function RecordCard({
             <div className="flex flex-wrap items-center gap-1.5 text-xs text-text-muted">
               <span className="font-medium text-text-secondary">{category}</span>
               <span>•</span>
-              <span className="font-mono text-[11px] text-text-muted">{date}</span>
+              <span className="font-mono text-caption text-text-muted">{date}</span>
               {accountName && (
                 <>
                   <span>•</span>
-                  <span className="text-[11px] font-mono text-text-muted truncate max-w-[120px] sm:max-w-[160px]">
+                  <span className="text-caption font-mono text-text-muted truncate max-w-[120px] sm:max-w-[160px]">
                     {accountName}
                   </span>
                 </>
@@ -227,7 +227,7 @@ export function RecordCard({
               size="md"
             />
           </div>
-          <span className="text-[10px] uppercase font-mono tracking-wider text-text-muted block">
+          <span className="text-caption uppercase font-mono tracking-wider text-text-muted block">
             {isInflow ? "Inflow" : "Outflow"}
           </span>
         </div>
@@ -250,7 +250,7 @@ export function RecordCard({
           {/* Tax Deductible Tag */}
           {isTaxDeductible && (
             <span
-              className="inline-flex items-center gap-1 rounded-md bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300"
+              className="inline-flex items-center gap-1 rounded-md bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 text-caption font-bold text-emerald-700 dark:text-emerald-300"
               title={scheduleCCategory || "Tax Deductible Write-Off"}
             >
               <TaxIcon className="w-2.5 h-2.5" />
@@ -260,20 +260,20 @@ export function RecordCard({
 
           {/* Owner Draw Badge */}
           {isOwnerDraw && (
-            <span className="inline-flex items-center rounded-md bg-purple-50 dark:bg-purple-950/40 px-1.5 py-0.5 text-[10px] font-bold text-purple-700 dark:text-purple-300">
+            <span className="inline-flex items-center rounded-md bg-purple-50 dark:bg-purple-950/40 px-1.5 py-0.5 text-caption font-bold text-purple-700 dark:text-purple-300">
               Owner Draw
             </span>
           )}
 
           {/* Anti-Commingling / Reimbursement Status */}
           {reimbursementStatus === "pending" && (
-            <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 dark:bg-amber-950/40 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-300">
+            <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 dark:bg-amber-950/40 px-1.5 py-0.5 text-caption font-bold text-amber-700 dark:text-amber-300">
               Reimbursement Due
             </span>
           )}
 
           {reimbursementStatus === "reimbursed" && (
-            <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-[10px] font-bold text-slate-600 dark:text-slate-400">
+            <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-caption font-bold text-slate-600 dark:text-slate-400">
               <CheckCircleIcon className="w-3 h-3 text-emerald-500" />
               Reimbursed
             </span>
@@ -290,7 +290,7 @@ export function RecordCard({
                 e.stopPropagation();
                 onReimburse(id);
               }}
-              className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 dark:text-amber-300 py-1 px-2 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-500/20 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1 text-caption font-bold text-amber-700 dark:text-amber-300 py-1 px-2 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-500/20 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors cursor-pointer"
             >
               <span>Reimburse</span>
             </button>

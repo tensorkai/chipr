@@ -9,7 +9,7 @@ interface EntityBadgeProps {
 export function EntityBadge({ type, label, size = "md" }: EntityBadgeProps) {
   const isPersonal = type === "personal";
 
-  const sizeClasses = size === "sm" ? "px-2 py-0.5 text-[11px]" : "px-2.5 py-1 text-xs";
+  const sizeClasses = size === "sm" ? "px-2 py-0.5 text-caption" : "px-2.5 py-1 text-xs";
 
   return (
     <span

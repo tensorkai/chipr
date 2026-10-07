@@ -29,18 +29,22 @@ export function BrandLoadingScreen({
   const [isFadingOut, setIsFadingOut] = useState(false);
 
   useEffect(() => {
-    if (!onComplete && minDuration <= 0) return;
+    if (!onComplete) return;
+
+    let exitTimer: ReturnType<typeof setTimeout> | undefined;
 
     // Display for the requested duration before starting exit fade
     const timer = setTimeout(() => {
       setIsFadingOut(true);
-      const exitTimer = setTimeout(() => {
+      exitTimer = setTimeout(() => {
         onComplete?.();
       }, 450); // 450ms smooth fadeout
-      return () => clearTimeout(exitTimer);
     }, minDuration);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(exitTimer);
+    };
   }, [minDuration, onComplete]);
 
   return (
@@ -54,28 +58,24 @@ export function BrandLoadingScreen({
       } ${className}`}
     >
       <style>{`
-        @keyframes chiprBreatheFade {
-          0%, 100% {
-            opacity: 0.18;
-            transform: scale(0.975);
-          }
-          50% {
-            opacity: 1;
-            transform: scale(1);
-          }
+        @keyframes chiprLoadingFadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
         }
-        .chipr-fading-wordmark {
-          animation: chiprBreatheFade 2.4s ease-in-out infinite;
-          will-change: opacity, transform;
+        .chipr-loading-brand {
+          animation: chiprLoadingFadeIn 900ms ease-out both;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .chipr-loading-brand { animation: none; }
         }
       `}</style>
 
-      <div className="flex flex-col items-center justify-center">
+      <div className="chipr-loading-brand flex flex-col items-center justify-center">
         {/* Bird Mascot Logo */}
-        <ChiprBirdMascot size="lg" animated withSparkles={false} />
+        <ChiprBirdMascot size="lg" animated={false} withSparkles={false} />
 
         {/* "Chipr" Wordmark with Smooth Fading Animation */}
-        <h1 className="chipr-fading-wordmark mt-5 text-4xl sm:text-5xl font-black tracking-tight text-text-primary">
+        <h1 className="mt-5 text-4xl sm:text-5xl font-black tracking-tight text-text-primary">
           Chipr
         </h1>
       </div>

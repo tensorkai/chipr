@@ -4,6 +4,7 @@ import React, { useState, useMemo } from "react";
 import { useFinance } from "@/context/FinanceContext";
 import { InvoiceStatusBadge } from "@/components/ui/InvoiceStatusBadge";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
+import { MascotNote } from "@/components/ui/MascotNote";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { NewInvoiceModal } from "@/components/modals/NewInvoiceModal";
 import { InvoiceViewModal } from "@/components/modals/InvoiceViewModal";
@@ -27,13 +28,13 @@ export function InvoicesView() {
     .reduce((sum, i) => sum + i.total, 0);
 
   return (
-    <div className="space-y-6 sm:space-y-8">
+    <div className="view-page space-y-6 sm:space-y-8">
       {/* Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 rounded-2xl border border-border-subtle bg-surface p-4 sm:p-6 shadow-xs">
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-extrabold text-text-primary tracking-tight">
-              Client Invoicing & Accounts Receivable
+              Invoices
             </h1>
             <span className="inline-flex items-center rounded-full bg-sky-50 dark:bg-sky-950/50 px-2.5 py-0.5 text-xs font-semibold text-sky-700 dark:text-sky-300">
               {settings.businessName || "Commercial Billing"}
@@ -54,10 +55,15 @@ export function InvoicesView() {
         </button>
       </div>
 
+      <MascotNote mood={invoices.some(invoice => invoice.status === "overdue") ? "alert" : "focus"} className="invoice-mascot-note">
+        <strong>{invoices.some(invoice => invoice.status === "overdue") ? "Let’s give pending payments some attention." : "Every invoice has a next step."}</strong>
+        <p>Use the status filters to review drafts, follow up on unpaid invoices, and track paid work. This is your business billing workspace.</p>
+      </MascotNote>
+
       {/* AR Metrics Cards (Computed Dynamically) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         <div className="rounded-2xl border border-border-subtle bg-surface p-3.5 sm:p-5 shadow-xs">
-          <span className="text-[11px] sm:text-xs text-text-muted">Total Invoiced</span>
+          <span className="text-caption sm:text-xs text-text-muted">Total Invoiced</span>
           <div className="mt-1 sm:mt-2">
             <MoneyAmount
               amount={totalInvoiced}
@@ -65,13 +71,13 @@ export function InvoicesView() {
               privacyMask={privacyMask}
             />
           </div>
-          <span className="text-[10px] sm:text-[11px] text-text-muted mt-1 block">
+          <span className="text-caption sm:text-caption text-text-muted mt-1 block">
             {invoices.length} invoices issued
           </span>
         </div>
 
         <div className="rounded-2xl border border-border-subtle bg-surface p-3.5 sm:p-5 shadow-xs">
-          <span className="text-[11px] sm:text-xs text-text-muted">Paid & Deposited</span>
+          <span className="text-caption sm:text-xs text-text-muted">Paid & Deposited</span>
           <div className="mt-1 sm:mt-2">
             <MoneyAmount
               amount={totalPaid}
@@ -81,13 +87,13 @@ export function InvoicesView() {
               privacyMask={privacyMask}
             />
           </div>
-          <span className="text-[10px] sm:text-[11px] text-inflow mt-1 block font-medium">
+          <span className="text-caption sm:text-caption text-inflow mt-1 block font-medium">
             Reconciled in checking
           </span>
         </div>
 
         <div className="rounded-2xl border border-border-subtle bg-surface p-3.5 sm:p-5 shadow-xs">
-          <span className="text-[11px] sm:text-xs text-text-muted">Pending Receivables</span>
+          <span className="text-caption sm:text-xs text-text-muted">Pending Receivables</span>
           <div className="mt-1 sm:mt-2">
             <MoneyAmount
               amount={metrics.outstandingReceivables}
@@ -95,13 +101,13 @@ export function InvoicesView() {
               privacyMask={privacyMask}
             />
           </div>
-          <span className="text-[10px] sm:text-[11px] text-warning mt-1 block font-medium">
+          <span className="text-caption sm:text-caption text-warning mt-1 block font-medium">
             Awaiting remittance
           </span>
         </div>
 
         <div className="rounded-2xl border border-border-subtle bg-surface p-3.5 sm:p-5 shadow-xs">
-          <span className="text-[11px] sm:text-xs text-text-muted">Overdue AR</span>
+          <span className="text-caption sm:text-xs text-text-muted">Overdue AR</span>
           <div className="mt-1 sm:mt-2">
             <MoneyAmount
               amount={metrics.overdueReceivables}
@@ -111,7 +117,7 @@ export function InvoicesView() {
             />
           </div>
           <span
-            className={`text-[10px] sm:text-[11px] mt-1 block font-medium ${
+            className={`text-caption sm:text-caption mt-1 block font-medium ${
               metrics.overdueReceivables > 0 ? "text-outflow" : "text-text-muted"
             }`}
           >
@@ -197,7 +203,7 @@ export function InvoicesView() {
                   </div>
 
                   {/* Line items preview */}
-                  <div className="pt-1 text-[11px] text-text-secondary">
+                  <div className="pt-1 text-caption text-text-secondary">
                     {inv.lineItems.map((li, idx) => (
                       <span key={idx} className="mr-3">
                         • {li.description} ({li.quantity}x @ ${li.unitPrice})

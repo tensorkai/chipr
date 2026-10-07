@@ -3,6 +3,8 @@
 import React, { useState, useMemo } from "react";
 import { useFinance } from "@/context/FinanceContext";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
+import { ChiprCompanion } from "@/components/ui/ChiprCompanion";
+import { MascotScene } from "@/components/ui/MascotScene";
 import { BalanceCard } from "@/components/ui/BalanceCard";
 import { RecordCard } from "@/components/ui/RecordCard";
 import { RunwayCard } from "@/components/ui/RunwayCard";
@@ -48,7 +50,7 @@ export function DashboardView() {
   const [editingAccount, setEditingAccount] = useState<FinancialAccount | null>(null);
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
   const [accountFilter, setAccountFilter] = useState<"all" | "liquid" | "savings" | "credit" | "investment">("all");
-  const [activityViewMode, setActivityViewMode] = useState<"cards" | "compact">("cards");
+  const [activityViewMode, setActivityViewMode] = useState<"cards" | "compact">("compact");
 
   // Filter accounts by type
   const filteredAccounts = useMemo(() => {
@@ -113,26 +115,26 @@ export function DashboardView() {
   const displayName = settings.businessName || settings.personalName || "Operations";
 
   return (
-    <div className="space-y-6 sm:space-y-8 max-w-6xl">
+    <div className="dashboard-view space-y-8">
       {/* ========================================================================= */}
       {/* 1. EXECUTIVE HERO: Greeting, Key Metrics & 3D Sapphire Card               */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="dashboard-hero">
         {/* Left Column: Greeting, Action Bar & 4 Executive KPI Cards */}
-        <div className="lg:col-span-7 xl:col-span-7 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border-subtle/80">
+        <div className="dashboard-summary">
+          <div className="dashboard-heading">
             <div>
               <div className="flex items-center gap-2.5">
                 <h1 className="text-xl sm:text-2xl font-extrabold text-text-primary tracking-tight">
-                  {displayName} Overview
+                  Your money, in focus.
                 </h1>
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/20 px-2 py-0.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-300">
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/20 px-2 py-0.5 text-caption font-bold text-emerald-700 dark:text-emerald-300">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   Live
                 </span>
               </div>
               <p className="mt-1 text-xs sm:text-sm text-text-muted">
-                Commercial cash position, operating burn rate, and real-time ledger stream.
+                Business overview for {displayName}. A clearer view of what comes in and what comes next.
               </p>
             </div>
 
@@ -157,17 +159,17 @@ export function DashboardView() {
                 className="inline-flex items-center gap-1.5 rounded-xl bg-brand hover:bg-brand-hover active:scale-[0.98] text-white px-3.5 py-2 text-xs font-semibold transition-all cursor-pointer shadow-xs"
               >
                 <PlusIcon className="w-3.5 h-3.5" />
-                <span>Record Tx</span>
+                <span>New transaction</span>
               </button>
             </div>
           </div>
 
           {/* 4 Executive KPI Cards in a 2x2 grid */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-3.5">
+          <div className="dashboard-metrics grid grid-cols-2 gap-4">
             {/* Card 1: Liquid Reserves */}
             <div className="rounded-2xl border border-border-subtle bg-surface p-3.5 sm:p-4 shadow-xs flex flex-col justify-between hover:border-border-strong hover:shadow-sm transition-all group">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-text-muted font-mono">
+                <span className="text-caption sm:text-xs font-semibold uppercase tracking-wider text-text-muted font-mono">
                   Liquid Reserves
                 </span>
                 <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 group-hover:scale-105 transition-transform">
@@ -182,7 +184,7 @@ export function DashboardView() {
                     privacyMask={privacyMask}
                   />
                 </div>
-                <p className="text-[10.5px] sm:text-[11px] text-text-muted mt-0.5">
+                <p className="text-caption sm:text-caption text-text-muted mt-0.5">
                   Checking & Treasury accounts
                 </p>
               </div>
@@ -191,7 +193,7 @@ export function DashboardView() {
             {/* Card 2: Total Inflow */}
             <div className="rounded-2xl border border-border-subtle bg-surface p-3.5 sm:p-4 shadow-xs flex flex-col justify-between hover:border-border-strong hover:shadow-sm transition-all group">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-text-muted font-mono">
+                <span className="text-caption sm:text-xs font-semibold uppercase tracking-wider text-text-muted font-mono">
                   Total Inflow
                 </span>
                 <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform">
@@ -208,7 +210,7 @@ export function DashboardView() {
                     privacyMask={privacyMask}
                   />
                 </div>
-                <p className="text-[10.5px] sm:text-[11px] text-text-muted mt-0.5">
+                <p className="text-caption sm:text-caption text-text-muted mt-0.5">
                   Client invoices & deposits
                 </p>
               </div>
@@ -217,7 +219,7 @@ export function DashboardView() {
             {/* Card 3: Operating Outflow */}
             <div className="rounded-2xl border border-border-subtle bg-surface p-3.5 sm:p-4 shadow-xs flex flex-col justify-between hover:border-border-strong hover:shadow-sm transition-all group">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-text-muted font-mono">
+                <span className="text-caption sm:text-xs font-semibold uppercase tracking-wider text-text-muted font-mono">
                   Operating Outflow
                 </span>
                 <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 group-hover:scale-105 transition-transform">
@@ -233,7 +235,7 @@ export function DashboardView() {
                     privacyMask={privacyMask}
                   />
                 </div>
-                <p className="text-[10.5px] sm:text-[11px] text-text-muted mt-0.5">
+                <p className="text-caption sm:text-caption text-text-muted mt-0.5">
                   OpEx, contractor fees & SaaS
                 </p>
               </div>
@@ -242,7 +244,7 @@ export function DashboardView() {
             {/* Card 4: Cash Runway */}
             <div className="rounded-2xl border border-border-subtle bg-surface p-3.5 sm:p-4 shadow-xs flex flex-col justify-between hover:border-border-strong hover:shadow-sm transition-all group">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-text-muted font-mono">
+                <span className="text-caption sm:text-xs font-semibold uppercase tracking-wider text-text-muted font-mono">
                   Cash Runway
                 </span>
                 <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 group-hover:scale-105 transition-transform">
@@ -255,7 +257,7 @@ export function DashboardView() {
                     ? "> 24 mo"
                     : `${metrics.cashRunwayMonths.toFixed(1)} mo`}
                 </div>
-                <p className="text-[10.5px] sm:text-[11px] text-text-muted mt-0.5">
+                <p className="text-caption sm:text-caption text-text-muted mt-0.5">
                   Net margin: {metrics.netMargin.toFixed(1)}%
                 </p>
               </div>
@@ -264,24 +266,25 @@ export function DashboardView() {
         </div>
 
         {/* Right Column: Ultra-Creative Chipr Sapphire Debit Card */}
-        <div className="lg:col-span-5 xl:col-span-5 flex flex-col items-center justify-center pt-2 lg:pt-0">
+        <div className="preserved-credit-card">
+          <div className="credit-card-heading"><span>Your business card</span><span>CHIPR / WALLET</span></div>
           <DebitCardMockup />
         </div>
       </div>
+
+      {!isCompletelyEmpty && <ChiprCompanion />}
 
       {/* Empty State Guided Starter */}
       {isCompletelyEmpty && (
         <div className="rounded-2xl border border-border-subtle bg-surface p-6 sm:p-8 shadow-xs space-y-4">
           <div className="flex items-start gap-4">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand text-white shadow-xs">
-              <SparklesIcon className="w-5 h-5" />
-            </div>
+            <MascotScene variant="perch" className="shrink-0" />
             <div>
               <h2 className="text-lg font-bold text-text-primary">
-                Welcome to Chipr
+                Every big picture starts small.
               </h2>
               <p className="mt-1 text-xs sm:text-sm text-text-muted leading-relaxed max-w-xl">
-                Start by linking your operating accounts, or load sample business data to explore cash flow trends, invoicing, and Schedule C tax deductions.
+                Give your business finances a place to land. Add your first account, then record a transaction or ask Chipr to help organize your expenses.
               </p>
             </div>
           </div>
@@ -328,7 +331,7 @@ export function DashboardView() {
               <h3 className="text-base sm:text-lg font-bold text-text-primary tracking-tight">
                 Accounts & Reserves
               </h3>
-              <span className="rounded-full bg-brand-subtle px-2 py-0.5 text-[11px] font-mono font-bold text-brand">
+              <span className="rounded-full bg-brand-subtle px-2 py-0.5 text-caption font-mono font-bold text-brand">
                 {accounts.length} Total
               </span>
             </div>
@@ -471,7 +474,7 @@ export function DashboardView() {
               <p className="text-xs font-bold text-text-primary group-hover:text-brand transition-colors">
                 Connect Financial Account
               </p>
-              <p className="text-[10px] text-text-muted mt-0.5">
+              <p className="text-caption text-text-muted mt-0.5">
                 Checking, Treasury, Credit Card, or Escrow
               </p>
             </div>
@@ -496,7 +499,7 @@ export function DashboardView() {
                 <h3 className="text-base font-bold text-text-primary tracking-tight">
                   Recent Activity
                 </h3>
-                <span className="rounded-full bg-raised px-2 py-0.5 text-[11px] font-mono font-semibold text-text-muted">
+                <span className="rounded-full bg-raised px-2 py-0.5 text-caption font-mono font-semibold text-text-muted">
                   {recentTransactions.length}
                 </span>
               </div>
@@ -610,7 +613,7 @@ export function DashboardView() {
               <button
                 type="button"
                 onClick={() => setActiveTab("reports")}
-                className="text-[11px] font-bold text-brand hover:text-brand-hover transition-colors cursor-pointer"
+                className="text-caption font-bold text-brand hover:text-brand-hover transition-colors cursor-pointer"
               >
                 Tax Summary →
               </button>
@@ -651,7 +654,7 @@ export function DashboardView() {
               <button
                 type="button"
                 onClick={() => setActiveTab("invoices")}
-                className="text-[11px] font-bold text-brand hover:text-brand-hover transition-colors cursor-pointer"
+                className="text-caption font-bold text-brand hover:text-brand-hover transition-colors cursor-pointer"
               >
                 View Invoices →
               </button>

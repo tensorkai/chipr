@@ -133,7 +133,7 @@ export function CommandPalette({
           >
             <XMarkIcon className="w-4 h-4" />
           </button>
-          <kbd className="hidden sm:inline-block rounded-md border border-border-subtle bg-surface px-2 py-0.5 text-[10px] font-mono text-text-muted">
+          <kbd className="hidden sm:inline-block rounded-md border border-border-subtle bg-surface px-2 py-0.5 text-caption font-mono text-text-muted">
             ESC
           </kbd>
         </div>
@@ -142,7 +142,7 @@ export function CommandPalette({
         <div className="p-3 max-h-96 overflow-y-auto space-y-4 text-xs">
           {/* Quick Actions */}
           <div className="space-y-1">
-            <span className="px-2 text-[10px] font-bold uppercase tracking-wider text-text-muted">
+            <span className="px-2 text-caption font-bold uppercase tracking-wider text-text-muted">
               Quick Actions
             </span>
             <div className="grid grid-cols-2 gap-1 pt-1">
@@ -195,7 +195,7 @@ export function CommandPalette({
 
           {/* Navigation */}
           <div className="space-y-1 border-t border-border-subtle pt-3">
-            <span className="px-2 text-[10px] font-bold uppercase tracking-wider text-text-muted">
+            <span className="px-2 text-caption font-bold uppercase tracking-wider text-text-muted">
               Navigation
             </span>
             <div className="grid grid-cols-2 gap-1 pt-1">
@@ -252,7 +252,7 @@ export function CommandPalette({
 
           {/* Preferences & Utilities */}
           <div className="space-y-1 border-t border-border-subtle pt-3">
-            <span className="px-2 text-[10px] font-bold uppercase tracking-wider text-text-muted">
+            <span className="px-2 text-caption font-bold uppercase tracking-wider text-text-muted">
               Preferences & Data
             </span>
             <div className="grid grid-cols-2 gap-1 pt-1">
@@ -324,7 +324,7 @@ export function CommandPalette({
           {/* Quick Credit Match */}
           {q && ("add credit".includes(q) || "credit".includes(q) || "top up".includes(q) || "top-up".includes(q) || "deposit".includes(q) || "fund".includes(q)) && (
             <div className="space-y-1 border-t border-border-subtle pt-3">
-              <span className="px-2 text-[10px] font-bold uppercase tracking-wider text-text-muted">
+              <span className="px-2 text-caption font-bold uppercase tracking-wider text-text-muted">
                 Action Match
               </span>
               <div
@@ -338,10 +338,10 @@ export function CommandPalette({
                   <CreditPlusIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   <div>
                     <p className="font-bold text-emerald-700 dark:text-emerald-300">Add Credit / Top-Up Account</p>
-                    <p className="text-[10px] text-text-muted">Simulate or record an inflow of funds into accounts</p>
+                    <p className="text-caption text-text-muted">Simulate or record an inflow of funds into accounts</p>
                   </div>
                 </div>
-                <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">↵ Run</span>
+                <span className="text-caption font-mono text-emerald-600 dark:text-emerald-400 font-bold">↵ Run</span>
               </div>
             </div>
           )}
@@ -349,7 +349,7 @@ export function CommandPalette({
           {/* Search matches */}
           {(matchedTxs.length > 0 || matchedInvoices.length > 0 || matchedAccounts.length > 0) && (
             <div className="space-y-1 border-t border-border-subtle pt-3">
-              <span className="px-2 text-[10px] font-bold uppercase tracking-wider text-text-muted">
+              <span className="px-2 text-caption font-bold uppercase tracking-wider text-text-muted">
                 Search Results
               </span>
               <div className="space-y-1 pt-1">
@@ -364,7 +364,7 @@ export function CommandPalette({
                   >
                     <div>
                       <p className="font-semibold text-text-primary">{t.merchant}</p>
-                      <p className="text-[10px] text-text-muted">{t.category} • {t.date}</p>
+                      <p className="text-caption text-text-muted">{t.category} • {t.date}</p>
                     </div>
                     <span className="font-mono font-semibold">
                       {t.amount >= 0 ? "+" : "-"}₱{Math.abs(t.amount).toFixed(2)}
@@ -382,7 +382,7 @@ export function CommandPalette({
                   >
                     <div>
                       <p className="font-semibold text-text-primary">{inv.clientName}</p>
-                      <p className="text-[10px] text-text-muted">{inv.invoiceNumber} • {inv.status}</p>
+                      <p className="text-caption text-text-muted">{inv.invoiceNumber} • {inv.status}</p>
                     </div>
                     <span className="font-mono font-semibold">₱{inv.total.toFixed(2)}</span>
                   </div>
@@ -393,7 +393,7 @@ export function CommandPalette({
         </div>
 
         {/* Footer */}
-        <div className="border-t border-border-subtle bg-canvas px-4 py-2 flex items-center justify-between text-[11px] text-text-muted">
+        <div className="border-t border-border-subtle bg-canvas px-4 py-2 flex items-center justify-between text-caption text-text-muted">
           <span>Navigate with ⌘K / Ctrl+K</span>
           <span className="font-mono">Chipr v2.1</span>
         </div>

@@ -162,7 +162,7 @@ export function CashFlowTrendChart({
         <div className="relative mt-4">
           {/* Active tooltip badge on hover / touch */}
           {activePoint && (
-            <div className="absolute top-1 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 sm:gap-4 rounded-xl border border-border-subtle bg-surface/95 px-3 py-1.5 text-[11px] sm:text-xs shadow-lg backdrop-blur-xs font-mono animate-in fade-in duration-100">
+            <div className="absolute top-1 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 sm:gap-4 rounded-xl border border-border-subtle bg-surface/95 px-3 py-1.5 text-caption sm:text-xs shadow-lg backdrop-blur-xs font-mono animate-in fade-in duration-100">
               <span className="font-semibold text-text-primary">{activePoint.date}</span>
               <span className="text-inflow">{privacyMask ? "₱••••••" : `+₱${activePoint.inflow.toFixed(0)}`}</span>
               <span className="text-outflow">{privacyMask ? "₱••••••" : `-₱${activePoint.outflow.toFixed(0)}`}</span>
@@ -309,7 +309,7 @@ export function CashFlowTrendChart({
           </svg>
 
           {/* X Axis Labels */}
-          <div className="flex justify-between px-8 pt-1 text-[10px] font-mono text-text-muted">
+          <div className="flex justify-between px-8 pt-1 text-caption font-mono text-text-muted">
             <span>{points[0]?.date}</span>
             <span>{points[Math.floor(points.length / 2)]?.date}</span>
             <span>{points[points.length - 1]?.date}</span>
@@ -435,7 +435,7 @@ export function AllocationDonutChart({
 
             {/* Center Readout */}
             <div className="absolute flex flex-col items-center justify-center text-center">
-              <span className="text-[10px] text-text-muted uppercase font-mono">
+              <span className="text-caption text-text-muted uppercase font-mono">
                 {hoveredCategory || "Total"}
               </span>
               <span className="text-xs font-bold font-mono text-text-primary">

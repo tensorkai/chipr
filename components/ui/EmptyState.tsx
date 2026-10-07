@@ -1,4 +1,5 @@
 import React from "react";
+import { MascotScene } from "./MascotScene";
 
 interface EmptyStateProps {
   icon: React.ReactNode;
@@ -25,9 +26,7 @@ export function EmptyState({
     <div
       className={`flex flex-col items-center justify-center rounded-2xl border border-dashed border-border-subtle bg-surface/50 py-12 px-6 text-center ${className}`}
     >
-      <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border-subtle bg-raised text-text-secondary shadow-xs mb-4">
-        {icon}
-      </div>
+      <MascotScene variant="ledger" badge={icon} className="mb-4" />
       <h3 className="text-base font-semibold text-text-primary">{title}</h3>
       <p className="mt-1 max-w-sm text-xs sm:text-sm text-text-muted leading-relaxed">
         {description}

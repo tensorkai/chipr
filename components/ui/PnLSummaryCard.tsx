@@ -129,7 +129,7 @@ export function PnLSummaryCard({
             <span className="text-base font-bold text-text-primary">
               Net Operating Income
             </span>
-            <p className="text-[11px] text-text-muted">
+            <p className="text-caption text-text-muted">
               Pre-tax operational net profit
             </p>
           </div>

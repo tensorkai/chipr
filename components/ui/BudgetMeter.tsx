@@ -1,4 +1,5 @@
 import React from "react";
+import { ChiprBirdMascot } from "./ChiprBirdMascot";
 import { MoneyAmount } from "./MoneyAmount";
 import { EditIcon, TrashIcon, SparklesIcon } from "./Icons";
 
@@ -67,7 +68,7 @@ export function BudgetMeter({
                 />
               </>
             ) : (
-              <span className="text-[11px] text-text-muted italic">(No limit)</span>
+              <span className="text-caption text-text-muted italic">(No limit)</span>
             )}
           </div>
         </div>
@@ -115,14 +116,14 @@ export function BudgetMeter({
             </>
           ) : (
             <>
-              <span className="text-text-muted text-[11px]">
+              <span className="text-text-muted text-caption">
                 Tracked Spending
               </span>
               {onEdit && (
                 <button
                   type="button"
                   onClick={onEdit}
-                  className="text-[11px] font-semibold text-brand hover:underline cursor-pointer"
+                  className="text-caption font-semibold text-brand hover:underline cursor-pointer"
                 >
                   Set Budget Ceiling
                 </button>
@@ -132,6 +133,10 @@ export function BudgetMeter({
         </div>
       </div>
 
+      <div className="chipr-budget-status">
+        <span aria-hidden="true"><ChiprBirdMascot size="xs" mood={isOverBudget || isWarning ? "alert" : hasLimit ? "focus" : "idle"} variant="face" /></span>
+        <p>{isOverBudget ? "Over your plan. Review this category’s spending." : isWarning ? "Getting close. Check what’s still planned." : hasLimit ? "Within your plan. Room for what comes next." : "Set a limit to give this category a plan."}</p>
+      </div>
       {/* Action Footer: View Logs & Guard Controls */}
       <div className="mt-4 pt-3 border-t border-border-subtle flex items-center justify-between gap-2">
         {onViewLogs ? (
@@ -143,7 +148,7 @@ export function BudgetMeter({
             <SparklesIcon className="w-3 h-3 text-indigo-500" />
             <span>View Logs</span>
             {promptCount > 0 && (
-              <span className="ml-0.5 rounded-full bg-indigo-200 dark:bg-indigo-800 px-1.5 py-0.2 text-[10px] font-mono">
+              <span className="ml-0.5 rounded-full bg-indigo-200 dark:bg-indigo-800 px-1.5 py-0.2 text-caption font-mono">
                 {promptCount}
               </span>
             )}

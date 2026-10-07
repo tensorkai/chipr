@@ -113,7 +113,7 @@ export function BalanceCard({
             <p className="text-xs font-bold text-text-primary truncate">
               {account.name}
             </p>
-            <p className="text-[10px] text-text-muted font-mono truncate">
+            <p className="text-caption text-text-muted font-mono truncate">
               {account.institution} • {account.accountNumberMasked}
             </p>
           </div>
@@ -127,7 +127,7 @@ export function BalanceCard({
               colored={isDebt}
               privacyMask={privacyMask}
             />
-            <span className="text-[9px] uppercase tracking-wider text-text-muted block font-mono">
+            <span className="text-caption uppercase tracking-wider text-text-muted block font-mono">
               {isDebt ? "Balance Due" : "Available"}
             </span>
           </div>
@@ -168,7 +168,7 @@ export function BalanceCard({
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-text-muted font-mono">
+              <span className="text-caption font-bold uppercase tracking-wider text-text-muted font-mono">
                 {theme.label}
               </span>
             </div>
@@ -186,7 +186,7 @@ export function BalanceCard({
               e.stopPropagation();
               openAddCreditModal(account);
             }}
-            className="flex items-center gap-1 py-1 px-2 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-all cursor-pointer text-[10px] font-bold border border-emerald-500/20 shadow-2xs"
+            className="flex items-center gap-1 py-1 px-2 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-all cursor-pointer text-caption font-bold border border-emerald-500/20 shadow-2xs"
             title={`Add credit to ${account.name}`}
           >
             <CreditPlusIcon className="w-3 h-3" />
@@ -212,11 +212,11 @@ export function BalanceCard({
       {/* Center: Prominent Balance Display */}
       <div className="relative z-10 my-4 space-y-1">
         <div className="flex items-baseline justify-between">
-          <span className="text-[10px] uppercase font-mono tracking-wider text-text-muted">
+          <span className="text-caption uppercase font-mono tracking-wider text-text-muted">
             {isDebt ? "Outstanding Balance" : "Current Balance"}
           </span>
           <span
-            className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${theme.chipColor}`}
+            className={`text-caption font-semibold px-2 py-0.5 rounded-full ${theme.chipColor}`}
           >
             {theme.chip}
           </span>
@@ -239,7 +239,7 @@ export function BalanceCard({
             {account.institution}
           </span>
           <span>•</span>
-          <span className="font-mono text-[11px] text-text-muted">
+          <span className="font-mono text-caption text-text-muted">
             {account.accountNumberMasked}
           </span>
         </div>
@@ -247,7 +247,7 @@ export function BalanceCard({
         <button
           type="button"
           onClick={handleCopyMasked}
-          className="flex items-center gap-1 text-[10px] font-mono text-text-muted hover:text-text-primary py-0.5 px-1.5 rounded-md hover:bg-raised transition-colors cursor-pointer shrink-0"
+          className="flex items-center gap-1 text-caption font-mono text-text-muted hover:text-text-primary py-0.5 px-1.5 rounded-md hover:bg-raised transition-colors cursor-pointer shrink-0"
           title="Copy account reference"
         >
           {copied ? (

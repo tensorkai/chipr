@@ -200,7 +200,7 @@ export function TransactionTable({
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-base font-bold text-text-primary tracking-tight">{title}</h3>
-              <span className="rounded-full bg-raised px-2 py-0.5 text-[11px] font-mono font-semibold text-text-muted">
+              <span className="rounded-full bg-raised px-2 py-0.5 text-caption font-mono font-semibold text-text-muted">
                 {filteredTransactions.length}
               </span>
             </div>
@@ -388,7 +388,7 @@ export function TransactionTable({
 
               {/* Sorting Toggles */}
               <div className="flex items-center gap-1 text-xs shrink-0 border-l border-border-subtle pl-2">
-                <span className="text-[11px] text-text-muted">Sort:</span>
+                <span className="text-caption text-text-muted">Sort:</span>
                 <button
                   type="button"
                   onClick={() => toggleSort("date")}
