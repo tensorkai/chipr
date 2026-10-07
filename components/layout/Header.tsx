@@ -2,12 +2,12 @@
 
 import React, { useState } from "react";
 import { useFinance } from "@/context/FinanceContext";
+import { ChiprBirdMascot } from "@/components/ui/ChiprBirdMascot";
 import { NewTransactionModal } from "@/components/modals/NewTransactionModal";
 import { NewInvoiceModal } from "@/components/modals/NewInvoiceModal";
 import { AccountModal } from "@/components/modals/AccountModal";
 import { CommandPalette } from "@/components/ui/CommandPalette";
 import {
-  LogoMark,
   EyeIcon,
   EyeSlashIcon,
   SunIcon,
@@ -63,7 +63,7 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-border-subtle bg-surface/85 px-4 sm:px-6 backdrop-blur-md">
+      <header className="app-header sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-border-subtle bg-surface/85 px-4 sm:px-6 backdrop-blur-md">
         {/* Left: Brand & Workspace Switcher */}
         <div className="flex items-center gap-3 sm:gap-6 min-w-0">
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
@@ -85,10 +85,10 @@ export function Header() {
               title="Chipr - Back to Overview"
             >
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/10 dark:bg-indigo-400/15 border border-indigo-500/25 p-1 shadow-xs group-hover:scale-105 transition-transform overflow-hidden">
-                <LogoMark className="w-7 h-7 drop-shadow-xs" />
+                <ChiprBirdMascot size="xs" variant="face" mood={privacyMask ? "privacy" : "idle"} />
               </div>
               <span className="text-base font-extrabold tracking-tight text-text-primary hidden sm:inline group-hover:text-brand transition-colors">
-                Chipr
+                chipr<span className="text-brand">.</span>
               </span>
             </button>
           </div>
@@ -114,7 +114,7 @@ export function Header() {
               <SearchIcon className="w-3.5 h-3.5" />
               <span>Search or run command...</span>
             </span>
-            <kbd className="rounded border border-border-subtle bg-surface px-1.5 py-0.5 text-[10px] font-mono">
+            <kbd className="rounded border border-border-subtle bg-surface px-1.5 py-0.5 text-caption font-mono">
               ⌘K
             </kbd>
           </button>
@@ -279,7 +279,7 @@ export function Header() {
               </>
             ) : (
               <>
-                <div className="flex h-5 w-5 sm:h-5.5 sm:w-5.5 items-center justify-center rounded-lg bg-linear-to-tr from-brand to-indigo-500 text-white text-[10px] font-bold shadow-xs">
+                <div className="flex h-5 w-5 sm:h-5.5 sm:w-5.5 items-center justify-center rounded-lg bg-linear-to-tr from-brand to-indigo-500 text-white text-caption font-bold shadow-xs">
                   {initials}
                 </div>
                 <span className="hidden sm:inline font-medium max-w-21 truncate text-text-primary">
