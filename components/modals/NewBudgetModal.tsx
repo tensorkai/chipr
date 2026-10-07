@@ -99,7 +99,7 @@ export function NewBudgetModal({
               <label className="block text-xs font-semibold text-text-secondary">
                 Category Name
               </label>
-              <span className="text-[10px] text-text-muted">
+              <span className="text-caption text-text-muted">
                 {budgetId ? "Rename or reassign category" : "Select or enter custom"}
               </span>
             </div>
@@ -123,7 +123,7 @@ export function NewBudgetModal({
                   key={c.id}
                   type="button"
                   onClick={() => setCategory(c.name)}
-                  className={`rounded-lg px-2 py-1 text-[11px] font-semibold transition-colors cursor-pointer border ${
+                  className={`rounded-lg px-2 py-1 text-caption font-semibold transition-colors cursor-pointer border ${
                     category.toLowerCase() === c.name.toLowerCase()
                       ? "bg-brand text-white border-brand shadow-2xs"
                       : "bg-surface border-border-subtle text-text-secondary hover:text-text-primary hover:bg-raised"

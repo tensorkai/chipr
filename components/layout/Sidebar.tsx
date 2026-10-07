@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useFinance, NavigationTab } from "@/context/FinanceContext";
 import { FinancialAccount, WorkspaceEntity } from "@/types/finance";
+import { ChiprBirdMascot } from "@/components/ui/ChiprBirdMascot";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { NewTransactionModal } from "@/components/modals/NewTransactionModal";
 import { AccountModal } from "@/components/modals/AccountModal";
@@ -28,7 +29,6 @@ import {
   ChevronRightIcon,
   UserIcon,
   BuildingOfficeIcon,
-  LogoMark,
   SparklesIcon,
   CreditPlusIcon,
   LockClosedIcon,
@@ -132,6 +132,11 @@ function SidebarBody({
       badgeColor: "red",
     },
     {
+      id: "budgets",
+      label: "Budgets",
+      icon: BudgetIcon,
+    },
+    {
       id: "reports",
       label: "Reports & Tax",
       icon: PnLIcon,
@@ -171,7 +176,7 @@ function SidebarBody({
   };
 
   return (
-    <div className="flex flex-col h-full justify-between">
+    <div className="sidebar-body flex flex-col h-full justify-between">
       {/* Scrollable upper section */}
       <div className="flex-1 overflow-y-auto no-scrollbar space-y-4 pr-0.5">
         {/* Quick Action Button */}
@@ -181,12 +186,12 @@ function SidebarBody({
           className="w-full flex items-center justify-center gap-2 rounded-xl bg-brand py-2.5 px-3 text-xs font-bold text-white shadow-xs hover:bg-brand-hover active:scale-[0.98] transition-all cursor-pointer"
         >
           <PlusIcon className="w-4 h-4" />
-          <span>+ Record Transaction</span>
+          <span>New transaction</span>
         </button>
 
         {/* Navigation Tabs */}
         <div className="space-y-1">
-          <div className="px-2 pb-1 text-[10px] font-bold uppercase tracking-widest text-text-muted opacity-70">
+          <div className="px-2 pb-1 text-caption font-bold uppercase tracking-widest text-text-muted opacity-70">
             Menu
           </div>
           {navItems.map((item) => {
@@ -196,6 +201,7 @@ function SidebarBody({
             return (
               <button
                 key={item.id}
+                aria-current={isActive ? "page" : undefined}
                 type="button"
                 onClick={() => handleNavClick(item.id)}
                 className={`w-full flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold transition-all duration-200 cursor-pointer ${
@@ -213,7 +219,7 @@ function SidebarBody({
 
                 {item.badge && (
                   <span
-                    className={`rounded-full px-2 py-0.5 text-[10px] font-mono font-bold transition-colors duration-200 ${
+                    className={`rounded-full px-2 py-0.5 text-caption font-mono font-bold transition-colors duration-200 ${
                       isActive
                         ? "bg-white/20 text-white"
                         : item.badgeColor === "red"
@@ -232,7 +238,7 @@ function SidebarBody({
         {/* Linked Accounts Section */}
         <div className="space-y-2 pt-1 border-t border-border-subtle">
           <div className="flex items-center justify-between px-2">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-text-muted opacity-70">
+            <span className="text-caption font-bold uppercase tracking-widest text-text-muted opacity-70">
               Accounts ({displayedAccounts.length})
             </span>
             <div className="flex items-center gap-2">
@@ -242,7 +248,7 @@ function SidebarBody({
                   openAddCreditModal();
                   onActionClose?.();
                 }}
-                className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 transition-colors cursor-pointer"
+                className="flex items-center gap-1 text-caption font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 transition-colors cursor-pointer"
                 title="Add credit or top up funds"
               >
                 <CreditPlusIcon className="w-3 h-3" />
@@ -251,7 +257,7 @@ function SidebarBody({
               <button
                 type="button"
                 onClick={handleAddAccountClick}
-                className="flex items-center gap-1 text-[10px] font-semibold text-brand hover:text-brand-hover transition-colors cursor-pointer"
+                className="flex items-center gap-1 text-caption font-semibold text-brand hover:text-brand-hover transition-colors cursor-pointer"
                 title="Add financial account"
               >
                 <PlusIcon className="w-3 h-3" />
@@ -287,10 +293,10 @@ function SidebarBody({
                         <AccIcon className="w-3.5 h-3.5" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[11px] font-semibold text-text-primary truncate group-hover:text-brand transition-colors">
+                        <p className="text-caption font-semibold text-text-primary truncate group-hover:text-brand transition-colors">
                           {acc.name}
                         </p>
-                        <p className="text-[9px] font-mono text-text-muted truncate opacity-70">
+                        <p className="text-caption font-mono text-text-muted truncate opacity-70">
                           {acc.institution} {acc.accountNumberMasked}
                         </p>
                       </div>
@@ -310,7 +316,7 @@ function SidebarBody({
                 <button
                   type="button"
                   onClick={() => handleNavClick("dashboard")}
-                  className="w-full text-center text-[10px] font-medium text-text-muted hover:text-brand transition-colors pt-1 cursor-pointer"
+                  className="w-full text-center text-caption font-medium text-text-muted hover:text-brand transition-colors pt-1 cursor-pointer"
                 >
                   +{displayedAccounts.length - 4} more accounts
                 </button>
@@ -320,11 +326,16 @@ function SidebarBody({
         </div>
       </div>
 
+      <button type="button" className="chipr-sidebar-perch" onClick={() => handleNavClick("chat")}>
+        <span aria-hidden="true"><ChiprBirdMascot size="sm" mood="wave" animated={false} withSparkles={false} /></span>
+        <span><strong>A little help?</strong><span>Ask Chipr <span aria-hidden="true">↗</span></span></span>
+      </button>
+
       {/* Bottom Section: Solvency Runway & User Profile */}
       <div className="pt-3 border-t border-border-subtle space-y-2.5 shrink-0">
         {/* Real-time Solvency / Runway Mini Widget */}
         <div className="rounded-xl border border-border-subtle bg-canvas/70 p-2.5 space-y-1">
-          <div className="flex items-center justify-between text-[10px]">
+          <div className="flex items-center justify-between text-caption">
             <span className="font-semibold text-text-muted uppercase tracking-wider">
               Cash Runway
             </span>
@@ -334,7 +345,7 @@ function SidebarBody({
                 : `${metrics.cashRunwayMonths.toFixed(1)} mo`}
             </span>
           </div>
-          <div className="flex items-center justify-between text-[10px] text-text-muted">
+          <div className="flex items-center justify-between text-caption text-text-muted">
             <span>Monthly Burn</span>
             <div className="flex items-baseline gap-0.5">
               <MoneyAmount
@@ -342,7 +353,7 @@ function SidebarBody({
                 size="xs"
                 privacyMask={privacyMask}
               />
-              <span className="text-[9px]">/mo</span>
+              <span className="text-caption">/mo</span>
             </div>
           </div>
         </div>
@@ -366,7 +377,7 @@ function SidebarBody({
               <p className="text-xs font-bold truncate text-text-primary">
                 {settings.businessName || settings.personalName || "Business Workspace"}
               </p>
-              <p className="text-[10px] text-text-muted truncate">
+              <p className="text-caption text-text-muted truncate">
                 {settings.email || "Operating Workspace"}
               </p>
             </div>
@@ -380,7 +391,7 @@ function SidebarBody({
           <button
             type="button"
             onClick={togglePrivacyMask}
-            className={`flex items-center gap-1.5 rounded-lg px-2 py-1 text-[11px] font-semibold transition-colors cursor-pointer ${
+            className={`flex items-center gap-1.5 rounded-lg px-2 py-1 text-caption font-semibold transition-colors cursor-pointer ${
               privacyMask
                 ? "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300"
                 : "text-text-muted hover:bg-raised hover:text-text-primary"
@@ -390,12 +401,12 @@ function SidebarBody({
             {privacyMask ? (
               <>
                 <EyeSlashIcon className="w-3.5 h-3.5 text-amber-500" />
-                <span className="font-mono text-[10px]">₱••••••</span>
+                <span className="font-mono text-caption">₱••••••</span>
               </>
             ) : (
               <>
                 <EyeIcon className="w-3.5 h-3.5" />
-                <span className="text-[10px]">Mask</span>
+                <span className="text-caption">Mask</span>
               </>
             )}
           </button>
@@ -404,18 +415,18 @@ function SidebarBody({
           <button
             type="button"
             onClick={toggleDarkMode}
-            className="flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-semibold text-text-muted hover:bg-raised hover:text-text-primary transition-colors cursor-pointer"
+            className="flex items-center gap-1 rounded-lg px-2 py-1 text-caption font-semibold text-text-muted hover:bg-raised hover:text-text-primary transition-colors cursor-pointer"
             title="Toggle theme appearance"
           >
             {darkMode ? (
               <>
                 <SunIcon className="w-3.5 h-3.5 text-amber-400" />
-                <span className="text-[10px]">Light</span>
+                <span className="text-caption">Light</span>
               </>
             ) : (
               <>
                 <MoonIcon className="w-3.5 h-3.5" />
-                <span className="text-[10px]">Dark</span>
+                <span className="text-caption">Dark</span>
               </>
             )}
           </button>
@@ -428,11 +439,11 @@ function SidebarBody({
                 logout();
               }
             }}
-            className="flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-semibold text-text-muted hover:text-rose-600 hover:bg-rose-50/50 dark:hover:bg-rose-950/20 transition-colors cursor-pointer"
+            className="flex items-center gap-1 rounded-lg px-2 py-1 text-caption font-semibold text-text-muted hover:text-rose-600 hover:bg-rose-50/50 dark:hover:bg-rose-950/20 transition-colors cursor-pointer"
             title="Lock workspace and sign out"
           >
             <LockClosedIcon className="w-3.5 h-3.5" />
-            <span className="text-[10px]">Lock</span>
+            <span className="text-caption">Lock</span>
           </button>
         </div>
       </div>
@@ -478,7 +489,7 @@ export function Sidebar() {
     <>
       {/* Desktop Left Rail Sidebar with Smooth Slide In & Out Animation */}
       <aside
-        className={`${
+        className={`workspace-sidebar ${
           isDeviceFramed ? "hidden" : "hidden md:flex"
         } flex-col justify-between shrink-0 border-r border-border-subtle bg-surface/80 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden ${
           isDesktopSidebarOpen
@@ -486,12 +497,13 @@ export function Sidebar() {
             : "w-0 p-0 opacity-0 -translate-x-full border-r-0 pointer-events-none"
         }`}
         aria-hidden={!isDesktopSidebarOpen}
+        inert={!isDesktopSidebarOpen}
       >
         <div className="w-56 h-full flex flex-col justify-between shrink-0">
           {/* Subtle desktop collapse header */}
           <div className="flex items-center justify-between pb-2 mb-2 border-b border-border-subtle/70">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
-              Navigation
+            <span className="text-caption font-bold uppercase tracking-wider text-text-muted">
+              Your workspace
             </span>
             <button
               type="button"
@@ -523,6 +535,7 @@ export function Sidebar() {
             : "invisible pointer-events-none opacity-0 delay-200"
         }`}
         aria-hidden={!isMobileSidebarOpen}
+        inert={!isMobileSidebarOpen}
       >
         {/* Backdrop Overlay with Smooth Fade Transition */}
         <div
@@ -551,7 +564,7 @@ export function Sidebar() {
               title="Return to Overview"
             >
               <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-500/10 dark:bg-indigo-400/15 border border-indigo-500/25 p-1 shadow-xs group-hover:scale-105 transition-transform overflow-hidden">
-                <LogoMark className="w-6 h-6 drop-shadow-xs" />
+                <ChiprBirdMascot size="xs" variant="face" />
               </div>
               <span className="text-sm font-extrabold tracking-tight text-text-primary group-hover:text-brand transition-colors">
                 Chipr

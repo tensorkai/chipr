@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useFinance } from "@/context/FinanceContext";
+import { MascotNote } from "@/components/ui/MascotNote";
 import { WorkspaceEntity, UserSettings } from "@/types/finance";
 import {
   UserIcon,
@@ -162,7 +163,8 @@ export function ProfileView() {
   };
 
   return (
-    <div className="space-y-5 sm:space-y-6 max-w-4xl pb-10">
+    <div className="view-page profile-view space-y-5 sm:space-y-6 pb-10">
+      {saveStatus === "saved" && <div role="status"><MascotNote mood="celebrate"><strong>Your preferences are updated.</strong><p>A workspace that feels a little more like you.</p></MascotNote></div>}
       {/* Top Navigation & Exit Bar */}
       <div className="flex items-center justify-between gap-2">
         <button
@@ -201,7 +203,7 @@ export function ProfileView() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-extrabold text-text-primary tracking-tight">
-              Profile & Account Settings
+              Your profile & preferences
             </h1>
             <span className="inline-flex items-center rounded-full bg-brand-subtle px-2.5 py-0.5 text-xs font-bold text-brand">
               Account
@@ -258,10 +260,10 @@ export function ProfileView() {
                 <h3 className="text-lg sm:text-xl font-bold text-text-primary tracking-tight truncate">
                   {personalName || (workspace === "business" ? "Business Entity" : "Personal Account")}
                 </h3>
-                <span className="rounded-md bg-indigo-50 dark:bg-indigo-950/50 px-2 py-0.5 text-[10px] font-bold text-indigo-700 dark:text-indigo-300">
+                <span className="rounded-md bg-indigo-50 dark:bg-indigo-950/50 px-2 py-0.5 text-caption font-bold text-indigo-700 dark:text-indigo-300">
                   {role || "Account Owner"}
                 </span>
-                <span className="rounded-md bg-sky-50 dark:bg-sky-950/50 px-2 py-0.5 text-[10px] font-bold text-sky-700 dark:text-sky-300">
+                <span className="rounded-md bg-sky-50 dark:bg-sky-950/50 px-2 py-0.5 text-caption font-bold text-sky-700 dark:text-sky-300">
                   {businessName || "No Business Name"}
                 </span>
               </div>
@@ -273,11 +275,11 @@ export function ProfileView() {
 
           <div className="flex items-center gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-border-subtle/50 text-xs font-mono text-text-muted">
             <div className="rounded-xl bg-canvas p-2.5 text-center min-w-[90px]">
-              <span className="text-[10px] uppercase block text-text-muted">Accounts</span>
+              <span className="text-caption uppercase block text-text-muted">Accounts</span>
               <span className="text-sm font-bold text-text-primary">{accounts.length} linked</span>
             </div>
             <div className="rounded-xl bg-canvas p-2.5 text-center min-w-[90px]">
-              <span className="text-[10px] uppercase block text-text-muted">Currency</span>
+              <span className="text-caption uppercase block text-text-muted">Currency</span>
               <span className="text-sm font-bold text-text-primary">{currency}</span>
             </div>
           </div>
@@ -314,7 +316,7 @@ export function ProfileView() {
                 placeholder="e.g. Benedict Fusin"
                 className="w-full rounded-xl border border-border-subtle bg-canvas px-3.5 py-2 text-xs text-text-primary placeholder:text-text-muted focus:border-brand focus:outline-none"
               />
-              <span className="text-[10px] text-text-muted mt-1 block">
+              <span className="text-caption text-text-muted mt-1 block">
                 Displayed as the primary authorized operator and signatory on business statements.
               </span>
             </div>
@@ -330,7 +332,7 @@ export function ProfileView() {
                 placeholder="e.g. alex@chipr.fi"
                 className="w-full rounded-xl border border-border-subtle bg-canvas px-3.5 py-2 text-xs text-text-primary placeholder:text-text-muted focus:border-brand focus:outline-none"
               />
-              <span className="text-[10px] text-text-muted mt-1 block">
+              <span className="text-caption text-text-muted mt-1 block">
                 Used for invoice notifications and account communications.
               </span>
             </div>
@@ -392,7 +394,7 @@ export function ProfileView() {
                 placeholder="e.g. Chipr Ventures LLC"
                 className="w-full rounded-xl border border-border-subtle bg-canvas px-3.5 py-2 text-xs text-text-primary placeholder:text-text-muted focus:border-brand focus:outline-none"
               />
-              <span className="text-[10px] text-text-muted mt-1 block">
+              <span className="text-caption text-text-muted mt-1 block">
                 Printed on invoice statements and business cash flow metrics.
               </span>
             </div>
@@ -582,7 +584,7 @@ export function ProfileView() {
               </div>
             </div>
 
-            <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+            <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-caption font-bold text-emerald-600 dark:text-emerald-400">
               Active Session
             </span>
           </div>
@@ -592,7 +594,7 @@ export function ProfileView() {
               <p className="text-xs font-bold text-text-primary">
                 {currentUser?.name || "Benedict Fusin"} ({currentUser?.email || "benedictfusin99@gmail.com"})
               </p>
-              <p className="text-[11px] text-text-muted">
+              <p className="text-caption text-text-muted">
                 Predefined credentials allow uninterrupted synchronized access across all your phones, tablets, and computers.
               </p>
             </div>

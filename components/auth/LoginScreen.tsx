@@ -55,7 +55,7 @@ export function LoginScreen() {
   };
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col items-center justify-center p-4 sm:p-6 bg-canvas text-text-primary transition-colors duration-200">
+    <div className="login-layout">
       {/* Top Controls: Theme Switcher */}
       <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
         <button
@@ -73,25 +73,39 @@ export function LoginScreen() {
         </button>
       </div>
 
+      <section className="login-story" aria-label="About Chipr">
+        <div className="login-wordmark">chipr<span>.</span></div>
+        <div className="login-story-content">
+          <p className="eyebrow">PERSONAL CLARITY. BUSINESS CONFIDENCE.</p>
+          <h2>A little clarity.<br />A bigger picture.</h2>
+          <p>Your everyday spending and everything you’re building. One thoughtful place to see it all.</p>
+          <div className="login-ledger" aria-hidden="true">
+            <div><span>01</span><strong>Know where you stand</strong><span>↗</span></div>
+            <div><span>02</span><strong>Make room for what’s next</strong><span>↗</span></div>
+            <div><span>03</span><strong>Keep your worlds in balance</strong><span>↗</span></div>
+          </div>
+        </div>
+        <p className="login-story-footer">Personal & business finance, thoughtfully connected.</p>
+      </section>
       {/* Main Login Card */}
-      <div className="w-full max-w-md">
+      <div className="login-form-panel w-full max-w-md">
         <div className="relative rounded-3xl border border-border-subtle bg-surface p-6 sm:p-8 shadow-xl backdrop-blur-md space-y-6">
           {/* Brand Header */}
           <div className="flex flex-col items-center text-center space-y-3">
             <div className="relative">
-              <ChiprBirdMascot size="md" animated withSparkles={false} />
+              <ChiprBirdMascot size="lg" mood={successAnimation ? "celebrate" : password && !showPassword ? "privacy" : "wave"} withSparkles={false} />
             </div>
 
             <div>
               <div className="inline-flex items-center gap-1.5 rounded-full border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/80 dark:bg-indigo-950/40 px-3 py-1 text-[11px] font-bold text-indigo-700 dark:text-indigo-300 shadow-2xs">
                 <ShieldCheckIcon className="w-3.5 h-3.5 text-indigo-500" />
-                <span>Exclusive Private Access</span>
+                <span>Your private workspace</span>
               </div>
               <h1 className="mt-2 text-2xl sm:text-3xl font-black tracking-tight text-text-primary">
                 Chipr
               </h1>
               <p className="text-xs text-text-muted mt-1">
-                Personal & Business Financial Tracking
+                Sign in to pick up where you left off.
               </p>
             </div>
           </div>
@@ -111,7 +125,7 @@ export function LoginScreen() {
             <div className="rounded-2xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-950/30 p-3.5 text-xs text-emerald-700 dark:text-emerald-300 flex items-center gap-2 animate-in fade-in duration-150">
               <CheckIcon className="w-4 h-4 text-emerald-600 shrink-0" />
               <span className="font-semibold">
-                Welcome back, Benedict! Opening your workspace...
+                Welcome back. Opening your workspace...
               </span>
             </div>
           )}
@@ -129,7 +143,7 @@ export function LoginScreen() {
                 autoFocus
                 autoComplete="email"
                 autoCapitalize="none"
-                placeholder="benedictfusin99@gmail.com"
+                placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full rounded-xl border border-border-subtle bg-canvas px-3.5 py-2.5 text-xs sm:text-sm text-text-primary placeholder:text-text-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 transition-all font-mono"
@@ -146,6 +160,7 @@ export function LoginScreen() {
               </div>
               <div className="relative">
                 <input
+                  id="login-password"
                   type={showPassword ? "text" : "password"}
                   required
                   autoComplete="current-password"
@@ -158,7 +173,7 @@ export function LoginScreen() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors cursor-pointer p-1"
-                  tabIndex={-1}
+
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
@@ -228,7 +243,7 @@ export function LoginScreen() {
         {/* Security badge footer */}
         <div className="mt-6 flex items-center justify-center gap-2 text-[11px] text-text-muted">
           <ShieldCheckIcon className="w-3.5 h-3.5 text-emerald-500" />
-          <span>Anti-Commingling Ledger • SQLite WAL Sync</span>
+          <span>Separate accounts. Clear records. • Connected workspace</span>
         </div>
       </div>
     </div>

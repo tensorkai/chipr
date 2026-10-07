@@ -3,12 +3,15 @@
 import React, { useState } from "react";
 import { useFinance } from "@/context/FinanceContext";
 import { ScheduleCCategory, Transaction } from "@/types/finance";
+import { MascotNote } from "@/components/ui/MascotNote";
 import { XMarkIcon } from "@/components/ui/Icons";
 
 interface NewTransactionModalProps {
   isOpen: boolean;
   onClose: () => void;
   editingTx?: Transaction | null;
+  /** Called after the record is added to local application state. */
+  onRecorded?: () => void;
 }
 
 const SCHEDULE_C_CATEGORIES: ScheduleCCategory[] = [
@@ -27,8 +30,9 @@ export function NewTransactionModal({
   isOpen,
   onClose,
   editingTx,
+  onRecorded,
 }: NewTransactionModalProps) {
-  const { accounts, addTransaction, updateTransaction, settings } = useFinance();
+  const { accounts, addTransaction, updateTransaction } = useFinance();
 
   const [type, setType] = useState<"expense" | "income">("expense");
   const [entity, setEntity] = useState<"personal" | "business">("business");
@@ -130,6 +134,7 @@ export function NewTransactionModal({
       });
     }
 
+    onRecorded?.();
     onClose();
   };
 
@@ -160,6 +165,10 @@ export function NewTransactionModal({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 text-xs sm:text-sm">
+          <MascotNote mood={isCrossEntityReimbursement ? "alert" : type === "income" ? "wave" : "focus"}>
+            <strong>{isCrossEntityReimbursement ? "Keep the two sides connected." : entity === "business" ? "A home for every business record." : "Make your everyday spending visible."}</strong>
+            <p>{isCrossEntityReimbursement ? "This record will be marked for reimbursement. Check which account paid for it." : "Check the account and date before saving. Personal and business records keep their own entity labels."}</p>
+          </MascotNote>
           {/* Flow Direction Selector */}
           <div>
             <label className="block text-xs font-semibold text-text-secondary mb-1">
@@ -231,7 +240,7 @@ export function NewTransactionModal({
                   Category
                 </label>
                 {entity === "personal" && (
-                  <span className="text-[10px] text-text-muted">Food, Clothes, Others</span>
+                  <span className="text-caption text-text-muted">Food, Clothes, Others</span>
                 )}
               </div>
               <input
@@ -262,7 +271,7 @@ export function NewTransactionModal({
                       key={catName}
                       type="button"
                       onClick={() => setCategory(catName)}
-                      className={`rounded-lg px-2 py-0.5 text-[10px] font-semibold transition-colors cursor-pointer border ${
+                      className={`rounded-lg px-2 py-0.5 text-caption font-semibold transition-colors cursor-pointer border ${
                         category.toLowerCase() === catName.toLowerCase()
                           ? "bg-brand text-white border-brand shadow-2xs"
                           : "bg-surface border-border-subtle text-text-secondary hover:text-text-primary hover:bg-raised"
@@ -329,7 +338,7 @@ export function NewTransactionModal({
               {isTaxDeductible && (
                 <div className="space-y-2.5 pt-1">
                   <div>
-                    <label className="block text-[11px] text-text-secondary mb-1">
+                    <label className="block text-caption text-text-secondary mb-1">
                       Schedule C Tax Category
                     </label>
                     <select
@@ -348,7 +357,7 @@ export function NewTransactionModal({
                   </div>
 
                   <div>
-                    <label className="block text-[11px] text-text-secondary mb-1">
+                    <label className="block text-caption text-text-secondary mb-1">
                       Deductible Portion: {deductiblePercentage}%
                     </label>
                     <div className="flex gap-2">
@@ -383,7 +392,7 @@ export function NewTransactionModal({
 
           {/* Anti-Commingling Guards */}
           <div className="rounded-xl border border-border-subtle bg-canvas p-3.5 space-y-2">
-            <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+            <p className="text-caption font-bold text-text-secondary uppercase tracking-wider">
               Anti-Commingling Safeguards
             </p>
 

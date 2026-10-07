@@ -22,7 +22,7 @@ export function TransactionsView() {
   const displayedTransactions = transactions;
 
   return (
-    <div className="space-y-6 max-w-6xl">
+    <div className="view-page space-y-6 max-w-6xl">
       {/* Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 rounded-2xl border border-border-subtle bg-surface p-4 sm:p-6 shadow-xs">
         <div>
@@ -58,7 +58,7 @@ export function TransactionsView() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4">
         <div className="rounded-2xl border border-border-subtle bg-surface p-3.5 sm:p-5 shadow-xs flex flex-col justify-between hover:border-border-strong hover:shadow-sm transition-all group">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] sm:text-xs font-semibold text-text-muted">
+            <span className="text-caption sm:text-xs font-semibold text-text-muted">
               Total Records
             </span>
             <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-slate-500/10 text-slate-600 dark:text-slate-400">
@@ -72,7 +72,7 @@ export function TransactionsView() {
 
         <div className="rounded-2xl border border-border-subtle bg-surface p-3.5 sm:p-5 shadow-xs flex flex-col justify-between hover:border-border-strong hover:shadow-sm transition-all group">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] sm:text-xs font-semibold text-text-muted">
+            <span className="text-caption sm:text-xs font-semibold text-text-muted">
               Total Inflows
             </span>
             <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
@@ -92,7 +92,7 @@ export function TransactionsView() {
 
         <div className="rounded-2xl border border-border-subtle bg-surface p-3.5 sm:p-5 shadow-xs flex flex-col justify-between hover:border-border-strong hover:shadow-sm transition-all group">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] sm:text-xs font-semibold text-text-muted">
+            <span className="text-caption sm:text-xs font-semibold text-text-muted">
               Total Outflows
             </span>
             <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400">
@@ -111,7 +111,7 @@ export function TransactionsView() {
 
         <div className="rounded-2xl border border-border-subtle bg-surface p-3.5 sm:p-5 shadow-xs flex flex-col justify-between hover:border-border-strong hover:shadow-sm transition-all group">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] sm:text-xs font-semibold text-text-muted">
+            <span className="text-caption sm:text-xs font-semibold text-text-muted">
               Tax Deductibles
             </span>
             <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">

@@ -54,7 +54,7 @@ export function ReportsView() {
   }, [deductibleTransactions]);
 
   return (
-    <div className="space-y-8 max-w-5xl">
+    <div className="view-page space-y-8 max-w-5xl">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-text-primary">
@@ -96,11 +96,11 @@ export function ReportsView() {
 
           <div className="flex items-center gap-4 text-xs">
             <div>
-              <span className="text-text-muted block text-[11px]">Total Deductible</span>
+              <span className="text-text-muted block text-caption">Total Deductible</span>
               <MoneyAmount amount={metrics.taxDeductibleTotal} size="sm" colored privacyMask={privacyMask} />
             </div>
             <div>
-              <span className="text-text-muted block text-[11px]">Est. Tax Offset (25%)</span>
+              <span className="text-text-muted block text-caption">Est. Tax Offset (25%)</span>
               <span className="font-mono font-bold text-inflow">
                 <MoneyAmount amount={metrics.estimatedTaxSavings} size="sm" privacyMask={privacyMask} />
               </span>
@@ -118,7 +118,7 @@ export function ReportsView() {
               >
                 <div className="min-w-0 pr-2">
                   <p className="font-bold text-xs text-text-primary truncate">{item.category}</p>
-                  <p className="text-[11px] text-text-muted font-mono mt-0.5">
+                  <p className="text-caption text-text-muted font-mono mt-0.5">
                     {item.count} record{item.count > 1 ? "s" : ""}
                     {item.category.includes("50%") && " (50% rule)"}
                   </p>
@@ -130,7 +130,7 @@ export function ReportsView() {
                     colored
                     privacyMask={privacyMask}
                   />
-                  <span className="text-[9px] uppercase tracking-wider text-text-muted block font-mono">
+                  <span className="text-caption uppercase tracking-wider text-text-muted block font-mono">
                     Write-off
                   </span>
                 </div>
@@ -171,11 +171,11 @@ export function ReportsView() {
                 <div>
                   <div className="flex items-center gap-2">
                     <p className="font-bold text-text-primary">{item.merchant}</p>
-                    <span className="rounded-md bg-amber-50 dark:bg-amber-950/50 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-300">
+                    <span className="rounded-md bg-amber-50 dark:bg-amber-950/50 px-1.5 py-0.5 text-caption font-bold text-amber-700 dark:text-amber-300">
                       Reimbursement Due
                     </span>
                   </div>
-                  <p className="text-[11px] text-text-muted mt-0.5 font-mono">
+                  <p className="text-caption text-text-muted mt-0.5 font-mono">
                     {item.date} • {item.accountName}
                   </p>
                 </div>

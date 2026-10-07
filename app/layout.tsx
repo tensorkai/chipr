@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  icons: { icon: "/brand/chipr-face.svg" },
   title: "Chipr — Personal & Business Financial Tracking",
   description: "Unified financial management for individuals, freelancers, and small businesses with anti-commingling entity segregation.",
 };

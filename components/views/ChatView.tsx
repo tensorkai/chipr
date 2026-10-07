@@ -19,6 +19,8 @@ import {
   ZapIcon,
   TransactionIcon,
 } from "@/components/ui/Icons";
+import { MascotScene } from "@/components/ui/MascotScene";
+import { ChiprBirdMascot } from "@/components/ui/ChiprBirdMascot";
 import { GroqSettingsModal } from "@/components/modals/GroqSettingsModal";
 import { DEFAULT_GROQ_MODEL, AVAILABLE_GROQ_MODELS } from "@/lib/groq-models";
 import { extractTransactionFromAiResponse } from "@/rag";
@@ -486,12 +488,12 @@ Your financial workspace currently has:
     AVAILABLE_GROQ_MODELS[0];
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8.5rem)] sm:h-[calc(100vh-6.5rem)] max-w-5xl mx-auto rounded-2xl border border-border-subtle bg-surface shadow-xs overflow-hidden">
+    <div className="chat-workspace flex flex-col bg-surface overflow-hidden">
       {/* 1. Header Toolbar */}
       <div className="flex items-center justify-between px-3.5 sm:px-5 py-3 border-b border-border-subtle bg-surface/90 backdrop-blur-md shrink-0 gap-2">
         <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
           <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-linear-to-tr from-brand to-indigo-500 text-white shadow-xs shrink-0">
-            <SparklesIcon className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <ChiprBirdMascot size="xs" mood={isThinking ? "thinking" : "idle"} variant="face" />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
@@ -502,7 +504,7 @@ Your financial workspace currently has:
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(true)}
-                className={`hidden sm:inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold transition-all cursor-pointer ${
+                className={`hidden sm:inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-caption font-semibold transition-all cursor-pointer ${
                   isGroqActive
                     ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50"
                     : "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/50"
@@ -521,8 +523,8 @@ Your financial workspace currently has:
                 </span>
               </button>
             </div>
-            <p className="text-[11px] text-text-muted truncate">
-              Chat expenses to auto-categorize & save to SQLite database
+            <p className="text-caption text-text-muted truncate">
+              Your companion for expenses, records, and financial questions
             </p>
           </div>
         </div>
@@ -617,18 +619,15 @@ Your financial workspace currently has:
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
         {chatMessages.length === 0 ? (
           /* Clean, Non-Redundant Hero (No Duplicate Icon) */
-          <div className="h-full flex flex-col items-center justify-center text-center px-4 py-8 max-w-xl mx-auto my-auto animate-in fade-in duration-200">
-            <div className="inline-flex items-center gap-2 rounded-full border border-brand/20 bg-brand/5 dark:bg-brand/10 px-3 py-1 text-xs font-bold text-brand mb-3">
-              <span className="h-2 w-2 rounded-full bg-brand animate-pulse" />
-              <span>Smart Expense Logging & Categorization</span>
-            </div>
+          <div className="min-h-full flex flex-col items-center justify-center text-center px-4 py-8 max-w-xl mx-auto my-auto animate-in fade-in duration-200">
+            <MascotScene variant="chat" className="mb-4" />
 
             <h3 className="text-lg sm:text-xl font-extrabold text-text-primary tracking-tight">
-              Chat Your Expenses & Ledger Inquiries
+              Big questions. Meet your little helper.
             </h3>
 
             <p className="mt-2 text-xs sm:text-sm text-text-muted leading-relaxed max-w-md">
-              Log commercial expenses, record client receipts, ask about cash runway, or calculate Schedule C deductions. Chipr AI organizes records directly in your SQLite database.
+              Log commercial expenses, record client receipts, ask about cash runway, or calculate Schedule C deductions. Chipr AI keeps your records organized in your workspace.
             </p>
 
             {/* Quick interactive expense prompt pills */}
@@ -655,7 +654,7 @@ Your financial workspace currently has:
 
             {/* Scope awareness indicator */}
             <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold bg-sky-50 text-sky-700 dark:bg-sky-950/50 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
+              <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-caption font-semibold bg-sky-50 text-sky-700 dark:bg-sky-950/50 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
                 <span className="h-1.5 w-1.5 rounded-full bg-current" />
                 Ledger: <strong>{settings.businessName || "Commercial Operations"}</strong>
               </span>
@@ -663,15 +662,15 @@ Your financial workspace currently has:
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(true)}
-                className="inline-flex items-center gap-1 rounded-full bg-canvas px-2.5 py-1 text-[11px] font-medium text-text-secondary border border-border-subtle hover:border-brand transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1 rounded-full bg-canvas px-2.5 py-1 text-caption font-medium text-text-secondary border border-border-subtle hover:border-brand transition-colors cursor-pointer"
               >
                 <ZapIcon className="w-3 h-3 text-amber-500" />
                 Model: <strong className="text-text-primary">{activeModelMeta.name}</strong>
               </button>
 
-              <span className="inline-flex items-center gap-1 rounded-full bg-canvas px-2.5 py-1 text-[11px] font-medium text-text-muted border border-border-subtle">
+              <span className="inline-flex items-center gap-1 rounded-full bg-canvas px-2.5 py-1 text-caption font-medium text-text-muted border border-border-subtle">
                 <ShieldCheckIcon className="w-3 h-3 text-emerald-500" />
-                SQLite Database Active
+                Workspace connected
               </span>
             </div>
           </div>
@@ -698,7 +697,7 @@ Your financial workspace currently has:
                   </div>
                 ) : (
                   <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-xl bg-brand text-white shadow-xs shrink-0 mt-0.5">
-                    <SparklesIcon className="w-4 h-4" />
+                    <ChiprBirdMascot size="sm" mood="focus" animated={false} withSparkles={false} className="chat-mascot-avatar" />
                   </div>
                 )}
 
@@ -709,13 +708,13 @@ Your financial workspace currently has:
                   } max-w-[88%] sm:max-w-[85%]`}
                 >
                   {/* Meta Label Row */}
-                  <div className="flex items-center gap-2 mb-1 px-1 text-[10px] text-text-muted font-mono">
+                  <div className="flex items-center gap-2 mb-1 px-1 text-caption text-text-muted font-mono">
                     <span className="font-semibold text-text-secondary">
                       {isUser ? "You" : "Chipr AI (Groq)"}
                     </span>
                     {msg.contextScope && (
                       <span
-                        className={`rounded px-1.5 py-0.2 text-[9px] uppercase font-bold tracking-wider ${
+                        className={`rounded px-1.5 py-0.2 text-caption uppercase font-bold tracking-wider ${
                           msg.contextScope === "personal"
                             ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300"
                             : msg.contextScope === "business"
@@ -748,7 +747,7 @@ Your financial workspace currently has:
                             <span className="h-1.5 w-1.5 rounded-full bg-brand animate-bounce [animation-delay:-0.15s]" />
                             <span className="h-1.5 w-1.5 rounded-full bg-brand animate-bounce" />
                           </span>
-                          <span className="text-[11px] font-mono">
+                          <span className="text-caption font-mono">
                             Analyzing & categorizing expense...
                           </span>
                         </div>
@@ -759,12 +758,12 @@ Your financial workspace currently has:
                       <div className="mt-3 rounded-xl border border-emerald-500/30 bg-emerald-50/60 dark:bg-emerald-950/30 p-3 text-xs text-text-primary animate-in fade-in duration-200">
                         <div className="flex items-center justify-between pb-2 border-b border-emerald-500/20">
                           <div className="flex items-center gap-1.5 font-bold text-emerald-700 dark:text-emerald-300">
-                            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-white text-[10px]">
+                            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-white text-caption">
                               ✓
                             </span>
                             <span>Recorded in SQLite Database</span>
                           </div>
-                          <span className="font-mono text-[10px] text-text-muted">
+                          <span className="font-mono text-caption text-text-muted">
                             {recordedTx.date}
                           </span>
                         </div>
@@ -776,11 +775,11 @@ Your financial workspace currently has:
                               <span>{recordedTx.merchant}</span>
                             </div>
                             <div className="flex flex-wrap items-center gap-1.5">
-                              <span className="rounded-md bg-canvas px-2 py-0.5 text-[11px] font-semibold text-text-secondary border border-border-subtle">
+                              <span className="rounded-md bg-canvas px-2 py-0.5 text-caption font-semibold text-text-secondary border border-border-subtle">
                                 {recordedTx.category}
                               </span>
                               <span
-                                className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold uppercase ${
+                                className={`rounded-md px-1.5 py-0.5 text-caption font-bold uppercase ${
                                   recordedTx.entity === "business"
                                     ? "bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300 border border-sky-200 dark:border-sky-800"
                                     : "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800"
@@ -789,13 +788,13 @@ Your financial workspace currently has:
                                 {recordedTx.entity}
                               </span>
                               {recordedTx.isTaxDeductible && (
-                                <span className="rounded-md bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-300 border border-teal-200 dark:border-teal-800 px-1.5 py-0.5 text-[10px] font-semibold">
+                                <span className="rounded-md bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-300 border border-teal-200 dark:border-teal-800 px-1.5 py-0.5 text-caption font-semibold">
                                   Tax Write-Off ({recordedTx.deductiblePercentage}%)
                                 </span>
                               )}
                             </div>
                             {recordedTx.scheduleCCategory && (
-                              <div className="text-[11px] text-text-muted">
+                              <div className="text-caption text-text-muted">
                                 IRS Form:{" "}
                                 <span className="font-medium text-text-secondary">
                                   {recordedTx.scheduleCCategory}
@@ -822,7 +821,7 @@ Your financial workspace currently has:
                                   },
                                 });
                               }}
-                              className="mt-2 text-[10px] text-text-muted hover:text-rose-600 transition-colors cursor-pointer hover:underline"
+                              className="mt-2 text-caption text-text-muted hover:text-rose-600 transition-colors cursor-pointer hover:underline"
                               title="Delete this transaction from database"
                             >
                               Undo
@@ -839,7 +838,7 @@ Your financial workspace currently has:
                       <button
                         type="button"
                         onClick={() => handleCopyMessage(msg.id, msg.content)}
-                        className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] text-text-muted hover:bg-raised hover:text-text-primary transition-colors cursor-pointer"
+                        className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-caption text-text-muted hover:bg-raised hover:text-text-primary transition-colors cursor-pointer"
                         title="Copy message text"
                       >
                         {isCopied ? (
@@ -896,11 +895,11 @@ Your financial workspace currently has:
         {isThinking && (
           <div className="flex gap-2.5 sm:gap-3.5 max-w-3xl mr-auto animate-in fade-in duration-200">
             <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-xl bg-brand text-white shadow-xs shrink-0 mt-0.5">
-              <SparklesIcon className="w-4 h-4 animate-spin" />
+              <ChiprBirdMascot size="xs" mood="thinking" />
             </div>
             <div className="flex flex-col items-start">
-              <span className="text-[10px] text-text-muted font-mono mb-1">
-                Chipr AI • Categorizing Expense
+              <span className="text-caption text-text-muted font-mono mb-1">
+                Chipr is thinking
               </span>
               <div className="flex items-center gap-2 rounded-2xl border border-border-subtle bg-canvas px-4 py-3 text-xs text-text-secondary shadow-xs">
                 <span className="flex items-center gap-1.5">
@@ -908,7 +907,7 @@ Your financial workspace currently has:
                   <span className="h-2 w-2 rounded-full bg-brand animate-bounce [animation-delay:-0.15s]" />
                   <span className="h-2 w-2 rounded-full bg-brand animate-bounce" />
                 </span>
-                <span className="text-[11px] text-text-muted ml-1">
+                <span className="text-caption text-text-muted ml-1">
                   Categorizing with {activeModelMeta.name}...
                 </span>
                 <button
@@ -946,7 +945,7 @@ Your financial workspace currently has:
           <div className="flex items-center justify-between px-1.5 sm:px-2 pt-1">
             <div className="flex items-center gap-2">
               {/* Context Tag Pill */}
-              <span className="inline-flex items-center gap-1.5 rounded-lg px-2 py-0.5 text-[10px] font-semibold bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300">
+              <span className="inline-flex items-center gap-1.5 rounded-lg px-2 py-0.5 text-caption font-semibold bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300">
                 <span className="h-1.5 w-1.5 rounded-full bg-sky-500" />
                 <span>Commercial Ledger</span>
               </span>
@@ -955,7 +954,7 @@ Your financial workspace currently has:
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(true)}
-                className="text-[10px] text-text-muted hover:text-brand transition-colors font-mono hidden sm:inline-block cursor-pointer"
+                className="text-caption text-text-muted hover:text-brand transition-colors font-mono hidden sm:inline-block cursor-pointer"
                 title="Change AI Model"
               >
                 {activeModelMeta.name.replace("OpenAI ", "")}
@@ -970,7 +969,7 @@ Your financial workspace currently has:
                       textareaRef.current.style.height = "auto";
                     }
                   }}
-                  className="text-[11px] text-text-muted hover:text-text-primary hover:underline cursor-pointer ml-1"
+                  className="text-caption text-text-muted hover:text-text-primary hover:underline cursor-pointer ml-1"
                 >
                   Clear
                 </button>
@@ -978,7 +977,7 @@ Your financial workspace currently has:
             </div>
 
             <div className="flex items-center gap-2.5">
-              <span className="text-[10px] text-text-muted hidden md:inline font-mono">
+              <span className="text-caption text-text-muted hidden md:inline font-mono">
                 Shift + Enter for new line
               </span>
 
@@ -1007,7 +1006,7 @@ Your financial workspace currently has:
         </div>
 
         {/* Privacy & Anti-Commingling Microcopy */}
-        <div className="flex items-center justify-between px-1 text-[10px] text-text-muted">
+        <div className="flex items-center justify-between px-1 text-caption text-text-muted">
           <span>
             Expenses are categorized and saved into your SQLite database.
           </span>
@@ -1055,7 +1054,7 @@ function renderFormattedMessage(content: string, isUser: boolean) {
     if (numberedMatch) {
       return (
         <div key={idx} className="flex items-baseline gap-2 my-0.5">
-          <span className="font-mono text-[11px] font-bold text-brand shrink-0">
+          <span className="font-mono text-caption font-bold text-brand shrink-0">
             {numberedMatch[1]}
           </span>
           <span className="flex-1">{formatInlineMarkers(numberedMatch[2])}</span>
@@ -1123,7 +1122,7 @@ function formatInlineMarkers(text: string): React.ReactNode {
       return (
         <code
           key={i}
-          className="rounded bg-canvas/80 border border-border-subtle px-1 py-0.2 font-mono text-[11px] text-text-primary"
+          className="rounded bg-canvas/80 border border-border-subtle px-1 py-0.2 font-mono text-caption text-text-primary"
         >
           {part.slice(1, -1)}
         </code>

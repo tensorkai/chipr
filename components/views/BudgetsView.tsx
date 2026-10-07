@@ -117,13 +117,13 @@ export function BudgetsView() {
   }, [personalCategories, searchCategory]);
 
   return (
-    <div className="space-y-6 sm:space-y-8">
+    <div className="view-page space-y-6 sm:space-y-8">
       {/* Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 rounded-2xl border border-border-subtle bg-surface p-4 sm:p-6 shadow-xs">
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-extrabold text-text-primary tracking-tight">
-              Personal Envelopes & Spending Tracking
+              Budgets & spending
             </h1>
             <span className="inline-flex items-center rounded-full bg-indigo-50 dark:bg-indigo-950/50 px-2.5 py-0.5 text-xs font-semibold text-indigo-700 dark:text-indigo-300">
               Personal Finance
@@ -191,7 +191,7 @@ export function BudgetsView() {
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 pt-2">
           <div className="rounded-xl border border-border-subtle bg-canvas p-3">
-            <span className="text-[11px] sm:text-xs text-text-muted">Total Budgeted</span>
+            <span className="text-caption sm:text-xs text-text-muted">Total Budgeted</span>
             <div className="mt-1">
               <MoneyAmount
                 amount={totalMonthlyBudget}
@@ -202,7 +202,7 @@ export function BudgetsView() {
             </div>
           </div>
           <div className="rounded-xl border border-border-subtle bg-canvas p-3">
-            <span className="text-[11px] sm:text-xs text-text-muted">Total Spent</span>
+            <span className="text-caption sm:text-xs text-text-muted">Total Spent</span>
             <div className="mt-1">
               <MoneyAmount
                 amount={-totalMonthlySpent}
@@ -214,13 +214,13 @@ export function BudgetsView() {
             </div>
           </div>
           <div className="rounded-xl border border-border-subtle bg-canvas p-3">
-            <span className="text-[11px] sm:text-xs text-text-muted">Active Categories</span>
+            <span className="text-caption sm:text-xs text-text-muted">Active Categories</span>
             <div className="mt-1 font-mono font-bold text-sm sm:text-base text-text-primary">
               {budgets.length} active
             </div>
           </div>
           <div className="rounded-xl border border-border-subtle bg-canvas p-3">
-            <span className="text-[11px] sm:text-xs text-text-muted">Savings Velocity</span>
+            <span className="text-caption sm:text-xs text-text-muted">Savings Velocity</span>
             <div className="mt-1 font-mono font-bold text-sm sm:text-base text-inflow">
               {metrics.savingsRate.toFixed(1)}% Saved
             </div>
@@ -334,19 +334,19 @@ export function BudgetsView() {
                       {cat.name}
                     </h4>
                     {hasActiveEnvelope && (
-                      <span className="rounded-md bg-indigo-50 dark:bg-indigo-950/60 px-1.5 py-0.5 text-[9px] font-semibold text-indigo-700 dark:text-indigo-300 shrink-0">
+                      <span className="rounded-md bg-indigo-50 dark:bg-indigo-950/60 px-1.5 py-0.5 text-caption font-semibold text-indigo-700 dark:text-indigo-300 shrink-0">
                         Envelope Active
                       </span>
                     )}
                   </div>
-                  <p className="text-text-muted text-[11px] line-clamp-2 mt-1">
+                  <p className="text-text-muted text-caption line-clamp-2 mt-1">
                     {cat.description}
                   </p>
                 </div>
 
                 <div className="mt-3 pt-2.5 border-t border-border-subtle flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] text-text-muted block">This Month</span>
+                    <span className="text-caption text-text-muted block">This Month</span>
                     <MoneyAmount
                       amount={-spent}
                       currency={effectiveCurrency}
@@ -360,12 +360,12 @@ export function BudgetsView() {
                     <button
                       type="button"
                       onClick={() => handleOpenLogs(cat.name)}
-                      className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-caption font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors cursor-pointer"
                     >
                       <SparklesIcon className="w-2.5 h-2.5 text-indigo-500" />
                       <span>View Logs</span>
                       {pCount > 0 && (
-                        <span className="rounded-full bg-indigo-200 dark:bg-indigo-800 px-1 text-[9px] font-mono">
+                        <span className="rounded-full bg-indigo-200 dark:bg-indigo-800 px-1 text-caption font-mono">
                           {pCount}
                         </span>
                       )}
@@ -375,7 +375,7 @@ export function BudgetsView() {
                       <button
                         type="button"
                         onClick={() => handleOpenEdit(activeEnvelope)}
-                        className="rounded-lg p-1 text-text-muted hover:text-text-primary hover:bg-raised transition-colors cursor-pointer text-[11px]"
+                        className="rounded-lg p-1 text-text-muted hover:text-text-primary hover:bg-raised transition-colors cursor-pointer text-caption"
                         title="Edit Envelope Limit"
                       >
                         <EditIcon className="w-3.5 h-3.5" />
@@ -384,7 +384,7 @@ export function BudgetsView() {
                       <button
                         type="button"
                         onClick={() => handleOpenNew(cat.name)}
-                        className="rounded-lg p-1 text-text-muted hover:text-text-primary hover:bg-raised transition-colors cursor-pointer text-[11px]"
+                        className="rounded-lg p-1 text-text-muted hover:text-text-primary hover:bg-raised transition-colors cursor-pointer text-caption"
                         title="Set Limit"
                       >
                         <PlusIcon className="w-3.5 h-3.5" />
@@ -428,16 +428,16 @@ export function BudgetsView() {
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <p className="font-bold text-xs text-text-primary truncate">{sub.name}</p>
-                      <span className="rounded-md bg-raised px-1.5 py-0.5 text-[9px] font-mono text-text-muted uppercase">
+                      <span className="rounded-md bg-raised px-1.5 py-0.5 text-caption font-mono text-text-muted uppercase">
                         {sub.entity}
                       </span>
                       {sub.recommendation === "cancel" && (
-                        <span className="rounded-md bg-outflow-subtle px-1.5 py-0.5 text-[9px] font-bold text-outflow">
+                        <span className="rounded-md bg-outflow-subtle px-1.5 py-0.5 text-caption font-bold text-outflow">
                           Audit Alert
                         </span>
                       )}
                     </div>
-                    <p className="text-text-muted text-[10px] truncate mt-0.5">
+                    <p className="text-text-muted text-caption truncate mt-0.5">
                       {sub.category} • Renews <span className="font-mono">{sub.nextRenewalDate}</span>
                     </p>
                   </div>
@@ -450,7 +450,7 @@ export function BudgetsView() {
                     size="sm"
                     privacyMask={privacyMask}
                   />
-                  <span className="text-text-muted text-[10px] block font-mono">
+                  <span className="text-text-muted text-caption block font-mono">
                     /{sub.cadence === "monthly" ? "mo" : "yr"}
                   </span>
                 </div>

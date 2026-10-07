@@ -167,7 +167,7 @@ export function AccountModal({
                 onChange={(e) => setBalance(e.target.value)}
                 className="w-full rounded-xl border border-border-subtle bg-canvas px-3.5 py-2 text-xs font-mono text-text-primary focus:border-brand focus:outline-none"
               />
-              <span className="text-[10px] text-text-muted">
+              <span className="text-caption text-text-muted">
                 {type === "credit" || type === "loan" ? "Negative for liability/debt" : "Positive for liquid/assets"}
               </span>
             </div>
