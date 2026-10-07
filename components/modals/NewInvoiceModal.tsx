@@ -251,7 +251,7 @@ export function NewInvoiceModal({ isOpen, onClose }: NewInvoiceModalProps) {
                   />
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-1 flex-1 sm:flex-none">
-                      <span className="sm:hidden text-[11px] text-text-muted">Qty:</span>
+                      <span className="sm:hidden text-caption text-text-muted">Qty:</span>
                       <input
                         type="number"
                         min="1"
@@ -264,7 +264,7 @@ export function NewInvoiceModal({ isOpen, onClose }: NewInvoiceModalProps) {
                       />
                     </div>
                     <div className="flex items-center gap-1 flex-1 sm:flex-none">
-                      <span className="sm:hidden text-[11px] text-text-muted">Rate:</span>
+                      <span className="sm:hidden text-caption text-text-muted">Rate:</span>
                       <input
                         type="number"
                         min="0"

@@ -90,7 +90,7 @@ export function CategoryLogsModal({
               <h2 className="text-lg sm:text-xl font-bold text-text-primary tracking-tight">
                 {category || "Category"} Logs
               </h2>
-              <span className="inline-flex items-center rounded-full bg-indigo-50 dark:bg-indigo-950/50 px-2 py-0.5 text-[11px] font-semibold text-indigo-700 dark:text-indigo-300">
+              <span className="inline-flex items-center rounded-full bg-indigo-50 dark:bg-indigo-950/50 px-2 py-0.5 text-caption font-semibold text-indigo-700 dark:text-indigo-300">
                 {promptLogsCount} Prompt {promptLogsCount === 1 ? "Log" : "Logs"}
               </span>
             </div>
@@ -111,7 +111,7 @@ export function CategoryLogsModal({
         {/* Category Summary Stats Bar */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 p-3 rounded-xl border border-border-subtle bg-canvas/70 shrink-0">
           <div>
-            <span className="text-[11px] text-text-muted block">Total Spent</span>
+            <span className="text-caption text-text-muted block">Total Spent</span>
             <div className="mt-0.5">
               <MoneyAmount
                 amount={-totalSpent}
@@ -123,13 +123,13 @@ export function CategoryLogsModal({
             </div>
           </div>
           <div>
-            <span className="text-[11px] text-text-muted block">Total Records</span>
+            <span className="text-caption text-text-muted block">Total Records</span>
             <span className="text-sm font-mono font-bold text-text-primary">
               {categoryTransactions.length} entries
             </span>
           </div>
           <div className="col-span-2 sm:col-span-1">
-            <span className="text-[11px] text-text-muted block">AI Prompt Logged</span>
+            <span className="text-caption text-text-muted block">AI Prompt Logged</span>
             <span className="text-sm font-mono font-bold text-indigo-600 dark:text-indigo-400">
               {promptLogsCount} from chat
             </span>
@@ -198,12 +198,12 @@ export function CategoryLogsModal({
                           {tx.merchant}
                         </h4>
                         {isAiPrompt && (
-                          <span className="inline-flex items-center gap-1 rounded-md bg-indigo-100 dark:bg-indigo-900/60 px-2 py-0.5 text-[10px] font-semibold text-indigo-700 dark:text-indigo-300">
+                          <span className="inline-flex items-center gap-1 rounded-md bg-indigo-100 dark:bg-indigo-900/60 px-2 py-0.5 text-caption font-semibold text-indigo-700 dark:text-indigo-300">
                             <SparklesIcon className="w-2.5 h-2.5" />
                             <span>AI Chat Prompt</span>
                           </span>
                         )}
-                        <span className="rounded-md bg-raised px-1.5 py-0.5 text-[10px] font-mono text-text-muted uppercase">
+                        <span className="rounded-md bg-raised px-1.5 py-0.5 text-caption font-mono text-text-muted uppercase">
                           {tx.entity}
                         </span>
                       </div>
@@ -252,7 +252,7 @@ export function CategoryLogsModal({
                   {/* AI Prompt Provenance Quote Card */}
                   {tx.note && (
                     <div className="mt-3 rounded-xl border border-indigo-200/80 dark:border-indigo-900/60 bg-indigo-50/70 dark:bg-indigo-950/40 p-2.5 text-xs">
-                      <div className="flex items-center gap-1.5 font-semibold text-[11px] text-indigo-700 dark:text-indigo-300 mb-0.5">
+                      <div className="flex items-center gap-1.5 font-semibold text-caption text-indigo-700 dark:text-indigo-300 mb-0.5">
                         <SparklesIcon className="w-3 h-3" />
                         <span>Prompt Provenance:</span>
                       </div>

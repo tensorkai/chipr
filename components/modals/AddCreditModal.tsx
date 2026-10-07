@@ -207,7 +207,7 @@ export function AddCreditModal() {
                 <h3 className="text-base sm:text-lg font-bold text-text-primary">
                   Add Credit
                 </h3>
-                <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-caption font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                   Tracker Mode
                 </span>
               </div>
@@ -307,7 +307,7 @@ export function AddCreditModal() {
                   Target Account
                 </label>
                 {selectedAccount && (
-                  <span className="text-[11px] font-mono text-text-muted">
+                  <span className="text-caption font-mono text-text-muted">
                     Current:{" "}
                     <MoneyAmount
                       amount={selectedAccount.balance}
@@ -336,7 +336,7 @@ export function AddCreditModal() {
                   <p className="text-xs text-text-muted">
                     No {entity} accounts currently exist.
                   </p>
-                  <p className="text-[11px] text-brand font-semibold">
+                  <p className="text-caption text-brand font-semibold">
                     A new &ldquo;{entity === "business" ? "Operating Checking" : "Primary Checking"}&rdquo; will be auto-created with this credit!
                   </p>
                 </div>
@@ -367,7 +367,7 @@ export function AddCreditModal() {
 
               {/* Quick Amount Chips */}
               <div className="flex items-center gap-1.5 flex-wrap pt-1">
-                <span className="text-[10px] font-mono uppercase text-text-muted mr-1">
+                <span className="text-caption font-mono uppercase text-text-muted mr-1">
                   Presets:
                 </span>
                 {PRESET_AMOUNTS.map((preset) => (
@@ -375,7 +375,7 @@ export function AddCreditModal() {
                     key={preset}
                     type="button"
                     onClick={() => handlePresetClick(preset)}
-                    className={`rounded-lg px-2.5 py-1 text-[11px] font-mono font-bold transition-all cursor-pointer ${
+                    className={`rounded-lg px-2.5 py-1 text-caption font-mono font-bold transition-all cursor-pointer ${
                       parseFloat(amount) === preset
                         ? "bg-emerald-600 text-white shadow-xs"
                         : "bg-canvas border border-border-subtle text-text-secondary hover:text-text-primary hover:bg-raised"
@@ -387,7 +387,7 @@ export function AddCreditModal() {
                 <button
                   type="button"
                   onClick={() => handleAddPresetIncrement(100)}
-                  className="rounded-lg px-2 py-1 text-[11px] font-mono text-text-muted hover:text-text-primary hover:bg-raised transition-colors cursor-pointer border border-dashed border-border-subtle"
+                  className="rounded-lg px-2 py-1 text-caption font-mono text-text-muted hover:text-text-primary hover:bg-raised transition-colors cursor-pointer border border-dashed border-border-subtle"
                   title="Add ₱100 to current amount"
                 >
                   +100
@@ -583,7 +583,7 @@ export function AddCreditModal() {
                   onChange={(e) => setNewCardBalance(e.target.value)}
                   className="w-full rounded-xl border border-border-subtle bg-canvas px-3.5 py-2 font-mono text-xs text-text-primary focus:border-brand focus:outline-none tabular-nums"
                 />
-                <span className="text-[10px] text-text-muted mt-0.5 block">
+                <span className="text-caption text-text-muted mt-0.5 block">
                   Enter 0.00 if freshly issued with no charges.
                 </span>
               </div>

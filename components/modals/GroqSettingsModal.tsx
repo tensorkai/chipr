@@ -166,7 +166,7 @@ export function GroqSettingsModal({
               <ShieldCheckIcon className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
               <div>
                 <p className="font-bold">Zero-Configuration Multi-Device Mode Active</p>
-                <p className="text-[11px] text-emerald-700 dark:text-emerald-300 mt-0.5 leading-relaxed">
+                <p className="text-caption text-emerald-700 dark:text-emerald-300 mt-0.5 leading-relaxed">
                   Groq AI inference runs directly through your server environment (<code className="font-mono font-semibold">GROQ_API_KEY</code>). You do not need to configure or input any API keys on any phone, tablet, or secondary device.
                 </p>
               </div>
@@ -176,7 +176,7 @@ export function GroqSettingsModal({
               <span className="text-amber-600 font-bold shrink-0 mt-0.5">⚠️</span>
               <div>
                 <p className="font-bold">Server Environment Configuration Missing</p>
-                <p className="text-[11px] text-amber-700 dark:text-amber-300 mt-0.5 leading-relaxed">
+                <p className="text-caption text-amber-700 dark:text-amber-300 mt-0.5 leading-relaxed">
                   Please specify <code className="font-mono font-semibold">GROQ_API_KEY</code> and <code className="font-mono font-semibold">GROQ_MODEL</code> in your server&apos;s <code className="font-mono font-semibold">.env.local</code> file.
                 </p>
               </div>
@@ -189,7 +189,7 @@ export function GroqSettingsModal({
               <label className="font-bold text-text-primary">
                 Active Inference Model
               </label>
-              <span className="text-[10px] text-text-muted font-medium">
+              <span className="text-caption text-text-muted font-medium">
                 Groq Ultra-Fast LPU Platform
               </span>
             </div>
@@ -220,16 +220,16 @@ export function GroqSettingsModal({
                           {model.name}
                         </span>
                         {model.recommended && (
-                          <span className="rounded-md bg-emerald-100 dark:bg-emerald-900/60 px-1.5 py-0.2 text-[9px] font-bold text-emerald-700 dark:text-emerald-300">
+                          <span className="rounded-md bg-emerald-100 dark:bg-emerald-900/60 px-1.5 py-0.2 text-caption font-bold text-emerald-700 dark:text-emerald-300">
                             Recommended
                           </span>
                         )}
                       </div>
-                      <span className="text-[10px] font-mono text-text-muted">
+                      <span className="text-caption font-mono text-text-muted">
                         {(model.contextWindow / 1000).toFixed(0)}k context
                       </span>
                     </div>
-                    <p className="text-[11px] text-text-muted mt-1 pl-5">
+                    <p className="text-caption text-text-muted mt-1 pl-5">
                       {model.description}
                     </p>
                   </div>
@@ -280,7 +280,7 @@ export function GroqSettingsModal({
         <div className="flex items-center justify-between pt-3 border-t border-border-subtle">
           <div className="flex items-center gap-1.5 text-xs text-text-muted">
             <LockClosedIcon className="w-3.5 h-3.5 text-brand" />
-            <span className="text-[11px]">Synchronized across all devices</span>
+            <span className="text-caption">Synchronized across all devices</span>
           </div>
 
           <div className="flex items-center gap-2">

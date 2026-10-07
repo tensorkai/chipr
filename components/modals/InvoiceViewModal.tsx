@@ -110,7 +110,7 @@ export function InvoiceViewModal({ isOpen, onClose, invoice }: InvoiceViewModalP
 
           {/* Billed To */}
           <div className="rounded-xl border border-border-subtle bg-canvas p-4">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-text-muted block mb-1">
+            <span className="text-caption font-bold uppercase tracking-wider text-text-muted block mb-1">
               Billed To
             </span>
             <p className="text-sm font-bold text-text-primary">{invoice.clientName}</p>
@@ -121,7 +121,7 @@ export function InvoiceViewModal({ isOpen, onClose, invoice }: InvoiceViewModalP
           <div className="overflow-x-auto no-scrollbar">
             <table className="w-full text-xs min-w-[320px]">
               <thead>
-                <tr className="border-b border-border-subtle text-left text-[11px] font-bold uppercase tracking-wider text-text-muted">
+                <tr className="border-b border-border-subtle text-left text-caption font-bold uppercase tracking-wider text-text-muted">
                   <th className="pb-3">Description</th>
                   <th className="pb-3 text-right">Qty</th>
                   <th className="pb-3 text-right">Unit Price</th>
