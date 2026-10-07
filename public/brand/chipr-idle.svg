@@ -1,0 +1,19 @@
+<svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Chipr mascot" focusable="false"><style>:root {
+  --mascot-body: #7770df;
+  --mascot-wing: #5d55bf;
+  --mascot-outline: #39335f;
+  --mascot-cream: #fff4dc;
+  --mascot-ink: #302c47;
+  --mascot-highlight: #ffffff;
+  --mascot-gold: #eeb95c;
+  --mascot-cheek: #edb4ab;
+  --mascot-mint: #b3dfc5;
+  --mascot-coin-ink: #306c57;
+  --mascot-shadow: #d8d5e8;
+  --companion-panel-width: 23rem;
+  --companion-trigger-size: 3.5rem;
+  --companion-edge: 1.5rem;
+  --companion-bottom: 1.5rem;
+  --companion-layer: 35;
+  --mascot-note-gap: .875rem;
+}</style><ellipse cx="60" cy="112" rx="30" ry="4" fill="var(--mascot-shadow)"></ellipse><g stroke="var(--mascot-outline)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M43 100v8h-8m8 0h7m24-8v8h-7m7 0h8" stroke="var(--mascot-gold)" stroke-width="5"></path><path d="M26 62C11 56 7 66 13 80l17 8M93 64c16-8 19 4 13 17l-13 7" fill="var(--mascot-wing)"></path><path d="M53 24c-6-11-3-16 3-17 4 4 6 8 6 13C65 8 73 7 77 10c-1 8-5 13-11 16" fill="var(--mascot-body)"></path><path d="M23 62c0-27 14-40 37-40s37 13 37 40v13c0 23-14 31-37 31s-37-8-37-31Z" fill="var(--mascot-body)"></path><path d="M32 69c0-17 12-30 28-30s28 13 28 30v9c0 16-10 22-28 22S32 94 32 78Z" fill="var(--mascot-cream)" stroke="none"></path><ellipse cx="43" cy="53" rx="17" ry="19" fill="var(--mascot-cream)" stroke="none"></ellipse><ellipse cx="77" cy="53" rx="17" ry="19" fill="var(--mascot-cream)" stroke="none"></ellipse><g stroke="none"><ellipse cx="44" cy="53" rx="6" ry="8" fill="var(--mascot-ink)"></ellipse><ellipse cx="76" cy="53" rx="6" ry="8" fill="var(--mascot-ink)"></ellipse><circle cx="46" cy="50" r="2" fill="var(--mascot-highlight)"></circle><circle cx="78" cy="50" r="2" fill="var(--mascot-highlight)"></circle></g><ellipse cx="33" cy="65" rx="5" ry="3" fill="var(--mascot-cheek)" stroke="none"></ellipse><ellipse cx="87" cy="65" rx="5" ry="3" fill="var(--mascot-cheek)" stroke="none"></ellipse><path d="M53 63q7-5 14 0l-7 9Z" fill="var(--mascot-gold)" stroke-width="2"></path><circle cx="60" cy="86" r="8" fill="var(--mascot-mint)" stroke="none"></circle><path d="M56 86h8m-4-4v8" stroke="var(--mascot-coin-ink)" stroke-width="2.5"></path><g fill="var(--mascot-wing)"><path d="M27 63c-11 2-14 18-3 26 5 3 10-1 12-8Z"></path><path d="M93 63c11 2 14 18 3 26-5 3-10-1-12-8Z"></path></g></g></svg>
