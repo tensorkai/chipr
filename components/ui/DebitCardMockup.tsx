@@ -14,7 +14,7 @@ export function DebitCardMockup({
   className = "",
   variant = "full",
 }: DebitCardMockupProps) {
-  const { settings, metrics, privacyMask, openAddCreditModal } = useFinance();
+  const { settings, accounts, workspace, privacyMask, openAddCreditModal } = useFinance();
   const [isFlipped, setIsFlipped] = useState(false);
   const [isFrozen, setIsFrozen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -38,12 +38,14 @@ export function DebitCardMockup({
   const cardContainerRef = useRef<HTMLDivElement>(null);
 
   const businessName = (
-    settings.businessName || "CHIPR VENTURES LLC"
+    (workspace === "business" ? settings.businessName : settings.personalName) || "CHIPR"
   ).toUpperCase();
   const cardholderName = (
     settings.personalName || "BENEDICT FUSIN"
   ).toUpperCase();
-  const cardBalance = metrics.businessLiquidCash;
+  const cardBalance = accounts
+    .filter(account => account.entity === workspace && account.currency === settings.currency && (account.type === "checking" || account.type === "savings"))
+    .reduce((sum, account) => sum + Math.round(account.balance * 100), 0) / 100;
   const cardNumberFormatted = "2024-12024-MN-0";
 
   // Dynamic 3D interactive tilt & specular light calculation
@@ -202,7 +204,7 @@ export function DebitCardMockup({
                   <div className="flex items-center gap-1.5 text-[8.5px] font-mono tracking-wider text-cyan-200/80 uppercase font-semibold">
                     <span>SAPPHIRE RESERVE</span>
                     <span className="text-cyan-400/60">•</span>
-                    <span className="text-cyan-300/70 font-sans tracking-normal text-[8px]">FDIC INSURED</span>
+                    <span className="text-cyan-300/70 font-sans tracking-normal text-[8px]">CARD PREVIEW</span>
                   </div>
                 </div>
               </div>
@@ -246,7 +248,7 @@ export function DebitCardMockup({
                 </div>
               </div>
 
-              {/* Integrated Liquid Treasury Display with Embedded Top-Up Action */}
+              {/* Integrated Workspace cash Display with Embedded Top-Up Action */}
               <div
                 onClick={(e) => {
                   e.stopPropagation();
@@ -258,7 +260,7 @@ export function DebitCardMockup({
                 <div className="flex items-center justify-end gap-1.5 mb-0.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   <span className="text-[8px] font-mono uppercase tracking-widest text-cyan-200/90 font-bold">
-                    Liquid Treasury
+                    Workspace cash
                   </span>
                   <span className="inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.2 text-[8px] font-bold text-emerald-300 bg-emerald-500/30 border border-emerald-400/40 group-hover/credit:bg-emerald-500/50 transition-colors">
                     <CreditPlusIcon className="w-2.5 h-2.5" />
@@ -268,6 +270,7 @@ export function DebitCardMockup({
                 <div className="text-white font-extrabold font-mono tracking-tight text-sm sm:text-base drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
                   <MoneyAmount
                     amount={cardBalance}
+                    currency={settings.currency}
                     size="sm"
                     privacyMask={privacyMask}
                     className="text-white font-bold tracking-tight"
@@ -391,7 +394,7 @@ export function DebitCardMockup({
             {/* Legal Fine Etching & Concierge Strip */}
             <div className="px-6 pb-5 space-y-1.5">
               <p className="text-[7.5px] leading-relaxed text-slate-400/90 font-mono">
-                Official Commercial Debit & Treasury Pass for Chipr Financial Platform. Issued under FDIC insured partner institutions. Not transferable.
+                Chipr card design preview. This visual represents your workspace and is not an issued payment card.
               </p>
               <div className="flex items-center justify-between text-[8.5px] font-mono text-cyan-300/90 pt-1.5 border-t border-white/10">
                 <span className="flex items-center gap-1.5 font-semibold">
@@ -477,7 +480,7 @@ export function DebitCardMockup({
       </div>
 
       <p className="text-[10px] text-center text-text-muted font-mono tracking-tight opacity-75">
-        Enterprise Sapphire Titanium • Dynamic 3D tilt, guilloche contour watermark & real-time calendar date
+        Sapphire card preview
       </p>
     </div>
   );

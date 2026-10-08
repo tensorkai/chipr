@@ -11,11 +11,13 @@ interface CashFlowTrendChartProps {
   transactions: Transaction[];
   privacyMask?: boolean;
   className?: string;
+  currency?: string;
 }
 
 export function CashFlowTrendChart({
   transactions,
   privacyMask = false,
+  currency = "PHP",
   className = "",
 }: CashFlowTrendChartProps) {
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
@@ -47,11 +49,16 @@ export function CashFlowTrendChart({
       ...data,
     }));
 
-    if (timeRange === "30d") {
-      return entries.slice(-15);
-    }
-    if (timeRange === "90d") {
-      return entries.slice(-30);
+    if (timeRange !== "all") {
+      const cutoff = new Date();
+      cutoff.setHours(0, 0, 0, 0);
+      cutoff.setDate(cutoff.getDate() - (timeRange === "30d" ? 29 : 89));
+      const today = new Date();
+      today.setHours(23, 59, 59, 999);
+      return entries.filter(entry => {
+        const date = new Date(`${entry.date}T12:00:00`);
+        return date >= cutoff && date <= today;
+      });
     }
     return entries;
   }, [transactions, timeRange]);
@@ -60,7 +67,7 @@ export function CashFlowTrendChart({
   const height = 180;
   const padding = { top: 20, right: 20, bottom: 30, left: 40 };
 
-  const { maxVal, minVal, inflowPath, outflowPath, areaPath } = useMemo(() => {
+  const { maxVal, inflowPath, outflowPath, areaPath } = useMemo(() => {
     if (points.length === 0) {
       return { maxVal: 100, minVal: 0, inflowPath: "", outflowPath: "", areaPath: "" };
     }
@@ -102,7 +109,9 @@ export function CashFlowTrendChart({
     const aPath = `${inPath} L ${lastX} ${bottomY} L ${firstX} ${bottomY} Z`;
 
     return { maxVal: max, minVal: min, inflowPath: inPath, outflowPath: outPath, areaPath: aPath };
-  }, [points]);
+  }, [points, padding.top, padding.right, padding.bottom, padding.left]);
+
+  const formatAmount = (amount: number) => privacyMask ? "\u2022\u2022\u2022\u2022\u2022\u2022" : new Intl.NumberFormat("en", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount);
 
   const activePoint = hoverIndex !== null && points[hoverIndex] ? points[hoverIndex] : null;
 
@@ -110,8 +119,8 @@ export function CashFlowTrendChart({
     <div className={`rounded-2xl border border-border-subtle bg-surface p-4 sm:p-6 shadow-xs ${className}`}>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border-subtle pb-4">
         <div>
-          <h3 className="text-base font-semibold text-text-primary">Cash Flow Trajectory</h3>
-          <p className="text-xs text-text-muted">Daily inflows vs outflows velocity</p>
+          <h3 className="text-base font-semibold text-text-primary">Cash flow</h3>
+          <p className="text-xs text-text-muted">The rhythm of your money, day by day.</p>
         </div>
 
         <div className="flex flex-wrap items-center justify-between sm:justify-end gap-3">
@@ -129,7 +138,8 @@ export function CashFlowTrendChart({
           <div className="flex items-center rounded-xl border border-border-subtle bg-canvas p-0.5 text-xs">
             <button
               type="button"
-              onClick={() => setTimeRange("30d")}
+              aria-pressed={timeRange === "30d"}
+              onClick={() => { setTimeRange("30d"); setHoverIndex(null); }}
               className={`rounded-lg px-2 py-1 font-medium transition-colors cursor-pointer ${
                 timeRange === "30d" ? "bg-surface font-bold text-text-primary shadow-xs" : "text-text-muted"
               }`}
@@ -138,7 +148,8 @@ export function CashFlowTrendChart({
             </button>
             <button
               type="button"
-              onClick={() => setTimeRange("90d")}
+              aria-pressed={timeRange === "90d"}
+              onClick={() => { setTimeRange("90d"); setHoverIndex(null); }}
               className={`rounded-lg px-2 py-1 font-medium transition-colors cursor-pointer ${
                 timeRange === "90d" ? "bg-surface font-bold text-text-primary shadow-xs" : "text-text-muted"
               }`}
@@ -147,7 +158,8 @@ export function CashFlowTrendChart({
             </button>
             <button
               type="button"
-              onClick={() => setTimeRange("all")}
+              aria-pressed={timeRange === "all"}
+              onClick={() => { setTimeRange("all"); setHoverIndex(null); }}
               className={`rounded-lg px-2 py-1 font-medium transition-colors cursor-pointer ${
                 timeRange === "all" ? "bg-surface font-bold text-text-primary shadow-xs" : "text-text-muted"
               }`}
@@ -164,15 +176,17 @@ export function CashFlowTrendChart({
           {activePoint && (
             <div className="absolute top-1 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 sm:gap-4 rounded-xl border border-border-subtle bg-surface/95 px-3 py-1.5 text-caption sm:text-xs shadow-lg backdrop-blur-xs font-mono animate-in fade-in duration-100">
               <span className="font-semibold text-text-primary">{activePoint.date}</span>
-              <span className="text-inflow">{privacyMask ? "₱••••••" : `+₱${activePoint.inflow.toFixed(0)}`}</span>
-              <span className="text-outflow">{privacyMask ? "₱••••••" : `-₱${activePoint.outflow.toFixed(0)}`}</span>
+              <span className="text-inflow">{formatAmount(activePoint.inflow)}</span>
+              <span className="text-outflow">{formatAmount(-activePoint.outflow)}</span>
               <span className="text-text-muted font-normal hidden sm:inline">
-                Net: {privacyMask ? "₱••••••" : `${activePoint.net >= 0 ? "+₱" : "-₱"}${Math.abs(activePoint.net).toFixed(2)}`}
+                Net: {formatAmount(activePoint.net)}
               </span>
             </div>
           )}
 
           <svg
+            role="img"
+            aria-label="Daily money in and money out. Use the date selector below to inspect values."
             viewBox={`0 0 ${width} ${height}`}
             className="w-full h-40 sm:h-44 overflow-visible touch-none"
             onMouseLeave={() => setHoverIndex(null)}
@@ -308,6 +322,12 @@ export function CashFlowTrendChart({
             })}
           </svg>
 
+          <label className="chart-inspector">Inspect a day
+            <select value={hoverIndex ?? ""} onChange={event => setHoverIndex(event.target.value === "" ? null : Number(event.target.value))}>
+              <option value="">Choose a date</option>
+              {points.map((point, index) => <option key={point.date} value={index}>{point.date}</option>)}
+            </select>
+          </label>
           {/* X Axis Labels */}
           <div className="flex justify-between px-8 pt-1 text-caption font-mono text-text-muted">
             <span>{points[0]?.date}</span>
@@ -317,7 +337,7 @@ export function CashFlowTrendChart({
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-10 text-center text-xs text-text-muted">
-          <p>Record multiple transactions across dates to generate trajectory lines.</p>
+          <p>Your cash flow takes shape here. Add transactions on two or more dates to see your trend.</p>
         </div>
       )}
     </div>
@@ -384,7 +404,7 @@ export function AllocationDonutChart({
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
 
-  let accumulatedOffset = 0;
+
 
   return (
     <div className={`rounded-2xl border border-border-subtle bg-surface p-5 sm:p-6 shadow-sm ${className}`}>
@@ -407,10 +427,9 @@ export function AllocationDonutChart({
                 strokeOpacity="0.08"
                 strokeWidth={strokeWidth}
               />
-              {categories.map((cat) => {
+              {categories.map((cat, index) => {
                 const strokeDasharray = `${(cat.percentage / 100) * circumference} ${circumference}`;
-                const strokeDashoffset = -accumulatedOffset;
-                accumulatedOffset += (cat.percentage / 100) * circumference;
+                const strokeDashoffset = -categories.slice(0, index).reduce((sum, category) => sum + category.percentage / 100 * circumference, 0);
 
                 const isHovered = hoveredCategory === cat.name;
 

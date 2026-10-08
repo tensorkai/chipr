@@ -7,7 +7,6 @@ import { ChiprCompanion } from "@/components/ui/ChiprCompanion";
 import { MascotScene } from "@/components/ui/MascotScene";
 import { BalanceCard } from "@/components/ui/BalanceCard";
 import { RecordCard } from "@/components/ui/RecordCard";
-import { RunwayCard } from "@/components/ui/RunwayCard";
 import { CashFlowTrendChart } from "@/components/ui/Charts";
 import { DebitCardMockup } from "@/components/ui/DebitCardMockup";
 import { NewTransactionModal } from "@/components/modals/NewTransactionModal";
@@ -34,9 +33,10 @@ import {
 export function DashboardView() {
   const {
     privacyMask,
-    metrics,
-    accounts,
-    transactions,
+    accounts: allAccounts,
+    transactions: allTransactions,
+    workspace,
+    setWorkspace,
     invoices,
     settings,
     markReimbursed,
@@ -51,6 +51,20 @@ export function DashboardView() {
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
   const [accountFilter, setAccountFilter] = useState<"all" | "liquid" | "savings" | "credit" | "investment">("all");
   const [activityViewMode, setActivityViewMode] = useState<"cards" | "compact">("compact");
+
+  // Overview is scoped to one entity and currency. Existing records use base
+  // units; sum integer cents here without changing the persistence contract.
+  const currency = settings.currency || "PHP";
+  const accounts = useMemo(() => allAccounts.filter(a => a.entity === workspace && a.currency === currency), [allAccounts, workspace, currency]);
+  const transactions = useMemo(() => allTransactions.filter(t => t.entity === workspace && (t.currency || allAccounts.find(a => a.id === t.accountId)?.currency || currency) === currency), [allTransactions, allAccounts, workspace, currency]);
+  const now = new Date();
+  const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const monthTransactions = transactions.filter(t => t.date.startsWith(monthKey));
+  const sumCents = (values: number[]) => values.reduce((sum, value) => sum + Math.round(value * 100), 0) / 100;
+  const cash = sumCents(accounts.filter(a => a.type === "checking" || a.type === "savings").map(a => a.balance));
+  const netWorth = sumCents(accounts.map(a => a.balance));
+  const monthIn = sumCents(monthTransactions.filter(t => t.amount > 0).map(t => t.amount));
+  const monthOut = sumCents(monthTransactions.filter(t => t.amount < 0).map(t => -t.amount));
 
   // Filter accounts by type
   const filteredAccounts = useMemo(() => {
@@ -97,7 +111,7 @@ export function DashboardView() {
 
   // Recent transactions (latest 6)
   const recentTransactions = useMemo(() => {
-    return transactions.slice(0, 6);
+    return [...transactions].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 6);
   }, [transactions]);
 
   const isCompletelyEmpty = accounts.length === 0 && transactions.length === 0;
@@ -111,168 +125,59 @@ export function DashboardView() {
     return invoices.filter((i) => i.status === "overdue").length;
   }, [invoices]);
 
-  // Owner or business name
-  const displayName = settings.businessName || settings.personalName || "Operations";
 
   return (
     <div className="dashboard-view space-y-8">
-      {/* ========================================================================= */}
-      {/* 1. EXECUTIVE HERO: Greeting, Key Metrics & 3D Sapphire Card               */}
-      {/* ========================================================================= */}
-      <div className="dashboard-hero">
-        {/* Left Column: Greeting, Action Bar & 4 Executive KPI Cards */}
-        <div className="dashboard-summary">
-          <div className="dashboard-heading">
-            <div>
-              <div className="flex items-center gap-2.5">
-                <h1 className="text-xl sm:text-2xl font-extrabold text-text-primary tracking-tight">
-                  Your money, in focus.
-                </h1>
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/20 px-2 py-0.5 text-caption font-bold text-emerald-700 dark:text-emerald-300">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Live
-                </span>
-              </div>
-              <p className="mt-1 text-xs sm:text-sm text-text-muted">
-                Business overview for {displayName}. A clearer view of what comes in and what comes next.
-              </p>
-            </div>
-
-            {/* Quick Action Button Cluster */}
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                type="button"
-                onClick={() => openAddCreditModal()}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-[0.98] text-white px-3.5 py-2 text-xs font-bold transition-all cursor-pointer shadow-xs"
-                title="Top up funds or add credit"
-              >
-                <CreditPlusIcon className="w-3.5 h-3.5" />
-                <span>Add Credit</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setEditingTx(null);
-                  setIsTxModalOpen(true);
-                }}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-brand hover:bg-brand-hover active:scale-[0.98] text-white px-3.5 py-2 text-xs font-semibold transition-all cursor-pointer shadow-xs"
-              >
-                <PlusIcon className="w-3.5 h-3.5" />
-                <span>New transaction</span>
-              </button>
-            </div>
-          </div>
-
-          {/* 4 Executive KPI Cards in a 2x2 grid */}
-          <div className="dashboard-metrics grid grid-cols-2 gap-4">
-            {/* Card 1: Liquid Reserves */}
-            <div className="rounded-2xl border border-border-subtle bg-surface p-3.5 sm:p-4 shadow-xs flex flex-col justify-between hover:border-border-strong hover:shadow-sm transition-all group">
-              <div className="flex items-center justify-between">
-                <span className="text-caption sm:text-xs font-semibold uppercase tracking-wider text-text-muted font-mono">
-                  Liquid Reserves
-                </span>
-                <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 group-hover:scale-105 transition-transform">
-                  <BankIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                </div>
-              </div>
-              <div className="mt-2.5 sm:mt-3">
-                <div className="text-lg sm:text-2xl font-extrabold font-mono tracking-tight text-text-primary">
-                  <MoneyAmount
-                    amount={metrics.businessLiquidCash}
-                    size="lg"
-                    privacyMask={privacyMask}
-                  />
-                </div>
-                <p className="text-caption sm:text-caption text-text-muted mt-0.5">
-                  Checking & Treasury accounts
-                </p>
-              </div>
-            </div>
-
-            {/* Card 2: Total Inflow */}
-            <div className="rounded-2xl border border-border-subtle bg-surface p-3.5 sm:p-4 shadow-xs flex flex-col justify-between hover:border-border-strong hover:shadow-sm transition-all group">
-              <div className="flex items-center justify-between">
-                <span className="text-caption sm:text-xs font-semibold uppercase tracking-wider text-text-muted font-mono">
-                  Total Inflow
-                </span>
-                <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform">
-                  <TrendingUpIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                </div>
-              </div>
-              <div className="mt-2.5 sm:mt-3">
-                <div className="text-lg sm:text-2xl font-extrabold font-mono tracking-tight text-inflow">
-                  <MoneyAmount
-                    amount={metrics.grossRevenue}
-                    size="lg"
-                    colored
-                    showSign
-                    privacyMask={privacyMask}
-                  />
-                </div>
-                <p className="text-caption sm:text-caption text-text-muted mt-0.5">
-                  Client invoices & deposits
-                </p>
-              </div>
-            </div>
-
-            {/* Card 3: Operating Outflow */}
-            <div className="rounded-2xl border border-border-subtle bg-surface p-3.5 sm:p-4 shadow-xs flex flex-col justify-between hover:border-border-strong hover:shadow-sm transition-all group">
-              <div className="flex items-center justify-between">
-                <span className="text-caption sm:text-xs font-semibold uppercase tracking-wider text-text-muted font-mono">
-                  Operating Outflow
-                </span>
-                <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 group-hover:scale-105 transition-transform">
-                  <TrendingDownIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                </div>
-              </div>
-              <div className="mt-2.5 sm:mt-3">
-                <div className="text-lg sm:text-2xl font-extrabold font-mono tracking-tight text-outflow">
-                  <MoneyAmount
-                    amount={-metrics.monthlyBurnRate}
-                    size="lg"
-                    colored
-                    privacyMask={privacyMask}
-                  />
-                </div>
-                <p className="text-caption sm:text-caption text-text-muted mt-0.5">
-                  OpEx, contractor fees & SaaS
-                </p>
-              </div>
-            </div>
-
-            {/* Card 4: Cash Runway */}
-            <div className="rounded-2xl border border-border-subtle bg-surface p-3.5 sm:p-4 shadow-xs flex flex-col justify-between hover:border-border-strong hover:shadow-sm transition-all group">
-              <div className="flex items-center justify-between">
-                <span className="text-caption sm:text-xs font-semibold uppercase tracking-wider text-text-muted font-mono">
-                  Cash Runway
-                </span>
-                <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 group-hover:scale-105 transition-transform">
-                  <WalletIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                </div>
-              </div>
-              <div className="mt-2.5 sm:mt-3">
-                <div className="text-lg sm:text-2xl font-extrabold font-mono tracking-tight text-brand">
-                  {metrics.cashRunwayMonths >= 99 || !isFinite(metrics.cashRunwayMonths)
-                    ? "> 24 mo"
-                    : `${metrics.cashRunwayMonths.toFixed(1)} mo`}
-                </div>
-                <p className="text-caption sm:text-caption text-text-muted mt-0.5">
-                  Net margin: {metrics.netMargin.toFixed(1)}%
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column: Ultra-Creative Chipr Sapphire Debit Card */}
-        <div className="preserved-credit-card">
-          <div className="credit-card-heading"><span>Your business card</span><span>CHIPR / WALLET</span></div>
+      <section className="overview-card-hero" aria-label="Chipr card and overview">
+        <div className="preserved-credit-card overview-top-card">
+          <div className="credit-card-heading"><span>{workspace === "business" ? "Business" : "Personal"} card design</span><span>SAPPHIRE / CHIPR</span></div>
           <DebitCardMockup />
         </div>
+      <header className="overview-heading">
+        <div>
+          <p className="overview-eyebrow">YOUR FINANCIAL WORKSPACE</p>
+          <h1>Your money, in focus<span>.</span></h1>
+          <p>{workspace === "business" ? settings.businessName || "Business" : settings.personalName || "Personal"} overview. A little clarity for your next move.</p>
+        </div>
+        <button type="button" className="finance-button finance-button-primary" onClick={() => { setEditingTx(null); setIsTxModalOpen(true); }}>
+          <PlusIcon className="w-4 h-4" /> New transaction
+        </button>
+      </header>
+      </section>
+
+      <div className="overview-toolbar">
+        <div className="workspace-segments" aria-label="Overview workspace">
+          <button type="button" aria-pressed={workspace === "personal"} onClick={() => { setWorkspace("personal"); setAccountFilter("all"); }}>Personal</button>
+          <button type="button" aria-pressed={workspace === "business"} onClick={() => { setWorkspace("business"); setAccountFilter("all"); }}>Business</button>
+        </div>
+        <span className="overview-period">{currency} <span aria-hidden="true">/</span> <time>{new Intl.DateTimeFormat("en", { month: "long", year: "numeric" }).format(now)}</time></span>
       </div>
 
-      {!isCompletelyEmpty && <ChiprCompanion />}
+      <section className="position-panel" aria-label="Financial position">
+        <div className="position-total">
+          <p><WalletIcon className="w-4 h-4" /> {workspace === "business" ? "Available cash" : "Net worth"}</p>
+          <MoneyAmount amount={workspace === "business" ? cash : netWorth} currency={currency} privacyMask={privacyMask} className="position-amount" />
+          <span>{workspace === "business" ? "Across your checking and savings accounts" : "Your account balances, including liabilities"}</span>
+          <button className="position-link" type="button" onClick={() => document.getElementById("overview-accounts")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" })}>Explore your accounts <ArrowRightIcon className="w-4 h-4" /></button>
+        </div>
+        <div className="position-detail">
+          <div><p><TrendingUpIcon className="w-4 h-4 text-inflow" /> Money in</p><MoneyAmount amount={monthIn} currency={currency} privacyMask={privacyMask} colored showSign size="lg" /><span>This month</span></div>
+          <div><p><TrendingDownIcon className="w-4 h-4 text-outflow" /> Money out</p><MoneyAmount amount={-monthOut} currency={currency} privacyMask={privacyMask} colored size="lg" /><span>This month</span></div>
+          <div><p>Net cash flow</p><MoneyAmount amount={monthIn - monthOut} currency={currency} privacyMask={privacyMask} size="lg" /><span>Money in minus money out</span></div>
+        </div>
+      </section>
+
+      <div className="overview-analysis">
+        <CashFlowTrendChart transactions={transactions} privacyMask={privacyMask} currency={currency} className="overview-chart" />
+        <section className="attention-panel">
+          <div className="section-heading"><h2>On your radar</h2><span className="radar-dot" /></div>
+          <p className="section-description">A few things worth a closer look.</p>
+          {workspace === "business" && <button type="button" className="attention-row" onClick={() => setActiveTab("invoices")}><span className="attention-icon"><InvoiceIcon className="w-5 h-5" /></span><span><strong>Client invoices</strong><small>{overdueCount > 0 ? `${overdueCount} overdue ? ready to review` : `${pendingInvoices.length} awaiting payment`}</small></span><ArrowRightIcon className="w-4 h-4" /></button>}
+          <button type="button" className="attention-row" onClick={() => setActiveTab("transactions")}><span className="attention-icon"><ShieldCheckIcon className="w-5 h-5" /></span><span><strong>Reimbursements</strong><small>{transactions.filter(t => t.reimbursementStatus === "pending").length} pending in this workspace</small></span><ArrowRightIcon className="w-4 h-4" /></button>
+          <button type="button" className="attention-row" onClick={() => setActiveTab(workspace === "personal" ? "budgets" : "reports")}><span className="attention-icon"><TaxIcon className="w-5 h-5" /></span><span><strong>{workspace === "personal" ? "Your spending plan" : "Reports & deductions"}</strong><small>{workspace === "personal" ? "Check in on your budgets" : "Review your business records"}</small></span><ArrowRightIcon className="w-4 h-4" /></button>
+          <div className="radar-note"><ShieldCheckIcon className="w-4 h-4" /><p>Personal and business.<br />Together here. Accounted for separately.</p></div>
+        </section>
+      </div>
 
       {/* Empty State Guided Starter */}
       {isCompletelyEmpty && (
@@ -284,7 +189,7 @@ export function DashboardView() {
                 Every big picture starts small.
               </h2>
               <p className="mt-1 text-xs sm:text-sm text-text-muted leading-relaxed max-w-xl">
-                Give your business finances a place to land. Add your first account, then record a transaction or ask Chipr to help organize your expenses.
+                Give your finances a place to land. Add your first account, then record a transaction or ask Chipr to help organize your expenses.
               </p>
             </div>
           </div>
@@ -307,7 +212,7 @@ export function DashboardView() {
               className="inline-flex items-center gap-1.5 rounded-xl bg-brand px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-brand-hover transition-all cursor-pointer"
             >
               <PlusIcon className="w-3.5 h-3.5" />
-              <span>Add Operating Account</span>
+              <span>Add your first account</span>
             </button>
             <button
               type="button"
@@ -324,19 +229,19 @@ export function DashboardView() {
       {/* ========================================================================= */}
       {/* 3. ACCOUNTS & BALANCES SECTION                                            */}
       {/* ========================================================================= */}
-      <div className="space-y-4">
+      <section id="overview-accounts" className="accounts-section space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-base sm:text-lg font-bold text-text-primary tracking-tight">
-                Accounts & Reserves
+                Your accounts
               </h3>
               <span className="rounded-full bg-brand-subtle px-2 py-0.5 text-caption font-mono font-bold text-brand">
                 {accounts.length} Total
               </span>
             </div>
             <p className="text-xs text-text-muted mt-0.5">
-              Operating checking, treasury reserves, corporate credit cards & investment funds
+              Balances in this workspace. Select an account to manage it.
             </p>
           </div>
 
@@ -360,7 +265,7 @@ export function DashboardView() {
               className="inline-flex items-center gap-1.5 rounded-xl border border-border-subtle bg-surface px-3 py-1.5 text-xs font-semibold text-text-primary hover:bg-raised hover:border-border-strong transition-all cursor-pointer shadow-xs"
             >
               <PlusIcon className="w-3.5 h-3.5 text-brand" />
-              <span>Connect Account</span>
+              <span>Add account</span>
             </button>
           </div>
         </div>
@@ -472,39 +377,34 @@ export function DashboardView() {
             </div>
             <div>
               <p className="text-xs font-bold text-text-primary group-hover:text-brand transition-colors">
-                Connect Financial Account
+                Add another account
               </p>
               <p className="text-caption text-text-muted mt-0.5">
-                Checking, Treasury, Credit Card, or Escrow
+                Checking, savings, credit or investments
               </p>
             </div>
           </button>
         </div>
-      </div>
-
-      {/* ========================================================================= */}
-      {/* 4. CASH FLOW TRAJECTORY CHART                                             */}
-      {/* ========================================================================= */}
-      <CashFlowTrendChart transactions={transactions} privacyMask={privacyMask} />
+      </section>
 
       {/* ========================================================================= */}
       {/* 5. TWO-COLUMN WORKSPACE: RECENT ACTIVITY & OPERATING INTELLIGENCE         */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Recent Activity (65%) */}
-        <div className="lg:col-span-2 space-y-4">
+      <div className="overview-lower">
+        {/* Left Column: Recent activity (65%) */}
+        <div className="activity-panel space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-base font-bold text-text-primary tracking-tight">
-                  Recent Activity
+                  Recent activity
                 </h3>
                 <span className="rounded-full bg-raised px-2 py-0.5 text-caption font-mono font-semibold text-text-muted">
                   {recentTransactions.length}
                 </span>
               </div>
               <p className="text-xs text-text-muted mt-0.5">
-                Real-time operational records, invoice receipts & tax write-offs
+                Your latest money movements, all in one place.
               </p>
             </div>
 
@@ -542,7 +442,7 @@ export function DashboardView() {
                 onClick={() => setActiveTab("transactions")}
                 className="text-xs text-brand hover:text-brand-hover font-semibold flex items-center gap-1 cursor-pointer pl-1"
               >
-                <span>View All</span>
+                <span>View all</span>
                 <ArrowRightIcon className="w-3 h-3" />
               </button>
             </div>
@@ -586,105 +486,16 @@ export function DashboardView() {
             )
           ) : (
             <div className="rounded-2xl border border-border-subtle bg-surface p-8 text-center text-xs text-text-muted shadow-xs">
-              No recent transactions recorded. Click above to record an inflow or expense.
+              Your activity will appear here. Record your first transaction to get started.
             </div>
           )}
         </div>
 
-        {/* Right Column: Operating Solvency & Tax Intelligence (35%) */}
-        <div className="space-y-5">
-          {/* Cash Runway & Monthly Burn */}
-          <RunwayCard
-            monthlyBurnRate={metrics.monthlyBurnRate}
-            cashRunwayMonths={metrics.cashRunwayMonths}
-            liquidReserves={metrics.businessLiquidCash}
-            privacyMask={privacyMask}
-          />
-
-          {/* Schedule C Tax Deductions Card */}
-          <div className="rounded-2xl border border-border-subtle bg-surface p-5 shadow-xs space-y-3">
-            <div className="flex items-center justify-between border-b border-border-subtle pb-3">
-              <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
-                <TaxIcon className="w-4 h-4" />
-                <h4 className="text-sm font-bold text-text-primary tracking-tight">
-                  Tax Deductions
-                </h4>
-              </div>
-              <button
-                type="button"
-                onClick={() => setActiveTab("reports")}
-                className="text-caption font-bold text-brand hover:text-brand-hover transition-colors cursor-pointer"
-              >
-                Tax Summary →
-              </button>
-            </div>
-
-            <div className="space-y-2 text-xs">
-              <div className="flex items-center justify-between">
-                <span className="text-text-muted">Total Write-Offs</span>
-                <MoneyAmount
-                  amount={metrics.taxDeductibleTotal}
-                  size="sm"
-                  colored
-                  privacyMask={privacyMask}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-text-muted">Est. Tax Savings (25%)</span>
-                <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-xs">
-                  <MoneyAmount
-                    amount={metrics.estimatedTaxSavings}
-                    size="sm"
-                    privacyMask={privacyMask}
-                  />
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Open Receivables & Invoices Card */}
-          <div className="rounded-2xl border border-border-subtle bg-surface p-5 shadow-xs space-y-3">
-            <div className="flex items-center justify-between border-b border-border-subtle pb-3">
-              <div className="flex items-center gap-2 text-sky-600 dark:text-sky-400">
-                <InvoiceIcon className="w-4 h-4" />
-                <h4 className="text-sm font-bold text-text-primary tracking-tight">
-                  Accounts Receivable
-                </h4>
-              </div>
-              <button
-                type="button"
-                onClick={() => setActiveTab("invoices")}
-                className="text-caption font-bold text-brand hover:text-brand-hover transition-colors cursor-pointer"
-              >
-                View Invoices →
-              </button>
-            </div>
-
-            <div className="space-y-2 text-xs">
-              <div className="flex items-center justify-between">
-                <span className="text-text-muted">Pending Invoices</span>
-                <span className="font-mono font-semibold text-text-primary">
-                  {pendingInvoices.length} invoices
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-text-muted">Total Outstanding</span>
-                <MoneyAmount
-                  amount={metrics.outstandingReceivables}
-                  size="sm"
-                  privacyMask={privacyMask}
-                />
-              </div>
-              {overdueCount > 0 && (
-                <div className="flex items-center justify-between pt-1 border-t border-border-subtle text-red-600 dark:text-red-400">
-                  <span>Overdue Invoices</span>
-                  <span className="font-mono font-bold">{overdueCount} overdue</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        <aside className="overview-companion">
+          <ChiprCompanion />
+        </aside>
       </div>
+
 
       {/* Modals */}
       <NewTransactionModal

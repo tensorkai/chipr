@@ -32,10 +32,10 @@ export function NewTransactionModal({
   editingTx,
   onRecorded,
 }: NewTransactionModalProps) {
-  const { accounts, addTransaction, updateTransaction } = useFinance();
+  const { accounts, addTransaction, updateTransaction, workspace } = useFinance();
 
   const [type, setType] = useState<"expense" | "income">("expense");
-  const [entity, setEntity] = useState<"personal" | "business">("business");
+  const [entity, setEntity] = useState<"personal" | "business">(workspace);
   const [merchant, setMerchant] = useState("");
   const [category, setCategory] = useState("");
   const [amount, setAmount] = useState("");
@@ -51,7 +51,9 @@ export function NewTransactionModal({
   const [note, setNote] = useState("");
 
   const [prevEditingTx, setPrevEditingTx] = useState(editingTx);
-  if (prevEditingTx !== editingTx) {
+  const [wasOpen, setWasOpen] = useState(false);
+  if (prevEditingTx !== editingTx || wasOpen !== isOpen) {
+    setWasOpen(isOpen);
     setPrevEditingTx(editingTx);
     if (editingTx) {
       setType(editingTx.amount < 0 ? "expense" : "income");
@@ -71,12 +73,12 @@ export function NewTransactionModal({
       setNote(editingTx.note || "");
     } else {
       setType("expense");
-      setEntity("business");
+      setEntity(workspace);
       setMerchant("");
       setCategory("");
       setAmount("");
       setDate(new Date().toISOString().split("T")[0]);
-      setAccountId(accounts[0]?.id || "unlinked");
+      setAccountId(accounts.find(account => account.entity === workspace)?.id || "unlinked");
       setIsTaxDeductible(false);
       setDeductiblePercentage(100);
       setScheduleCCategory("Office & Software Subscriptions");
@@ -184,7 +186,7 @@ export function NewTransactionModal({
                     : "text-text-muted hover:text-text-primary"
                 }`}
               >
-                - Operating Outflow / Expense
+                - Expense
               </button>
               <button
                 type="button"
@@ -195,7 +197,7 @@ export function NewTransactionModal({
                     : "text-text-muted hover:text-text-primary"
                 }`}
               >
-                + Client Inflow / Revenue
+                + Income
               </button>
             </div>
           </div>

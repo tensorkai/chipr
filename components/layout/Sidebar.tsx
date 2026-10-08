@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useFinance, NavigationTab } from "@/context/FinanceContext";
-import { FinancialAccount, WorkspaceEntity } from "@/types/finance";
+import { FinancialAccount } from "@/types/finance";
 import { ChiprBirdMascot } from "@/components/ui/ChiprBirdMascot";
 import { MoneyAmount } from "@/components/ui/MoneyAmount";
 import { NewTransactionModal } from "@/components/modals/NewTransactionModal";
@@ -13,7 +13,6 @@ import {
   BudgetIcon,
   InvoiceIcon,
   PnLIcon,
-  ShieldCheckIcon,
   PlusIcon,
   WalletIcon,
   BankIcon,
@@ -28,11 +27,9 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   UserIcon,
-  BuildingOfficeIcon,
   SparklesIcon,
   CreditPlusIcon,
   LockClosedIcon,
-  LogoutIcon,
 } from "@/components/ui/Icons";
 
 interface NavItem {
@@ -75,11 +72,9 @@ function SidebarBody({
     activeTab,
     setActiveTab,
     workspace,
-    setWorkspace,
     accounts,
     transactions,
     invoices,
-    metrics,
     privacyMask,
     togglePrivacyMask,
     darkMode,
@@ -154,7 +149,7 @@ function SidebarBody({
   ];
 
   // Show all financial accounts
-  const displayedAccounts = accounts;
+  const displayedAccounts = accounts.filter(account => account.entity === workspace && account.currency === settings.currency);
 
   const handleNavClick = (tab: NavigationTab) => {
     if (tab === "profile" && activeTab === "profile") {
@@ -304,6 +299,7 @@ function SidebarBody({
                     <div className="text-right shrink-0">
                       <MoneyAmount
                         amount={acc.balance}
+                        currency={acc.currency}
                         size="xs"
                         privacyMask={privacyMask}
                       />
@@ -333,30 +329,7 @@ function SidebarBody({
 
       {/* Bottom Section: Solvency Runway & User Profile */}
       <div className="pt-3 border-t border-border-subtle space-y-2.5 shrink-0">
-        {/* Real-time Solvency / Runway Mini Widget */}
-        <div className="rounded-xl border border-border-subtle bg-canvas/70 p-2.5 space-y-1">
-          <div className="flex items-center justify-between text-caption">
-            <span className="font-semibold text-text-muted uppercase tracking-wider">
-              Cash Runway
-            </span>
-            <span className="font-mono font-bold text-sky-600 dark:text-sky-400">
-              {metrics.cashRunwayMonths >= 99 || !isFinite(metrics.cashRunwayMonths)
-                ? "> 24 mo"
-                : `${metrics.cashRunwayMonths.toFixed(1)} mo`}
-            </span>
-          </div>
-          <div className="flex items-center justify-between text-caption text-text-muted">
-            <span>Monthly Burn</span>
-            <div className="flex items-baseline gap-0.5">
-              <MoneyAmount
-                amount={metrics.monthlyBurnRate}
-                size="xs"
-                privacyMask={privacyMask}
-              />
-              <span className="text-caption">/mo</span>
-            </div>
-          </div>
-        </div>
+        <div className="sidebar-workspace-label"><span className="radar-dot" />{workspace === "personal" ? "Personal workspace" : "Business workspace"}</div>
 
         {/* User Account / Profile Card */}
         <button
@@ -375,10 +348,10 @@ function SidebarBody({
             </div>
             <div className="min-w-0">
               <p className="text-xs font-bold truncate text-text-primary">
-                {settings.businessName || settings.personalName || "Business Workspace"}
+                {workspace === "business" ? settings.businessName || "Business workspace" : settings.personalName || "Personal workspace"}
               </p>
               <p className="text-caption text-text-muted truncate">
-                {settings.email || "Operating Workspace"}
+                {workspace === "business" ? "Business accounts & records" : "Personal accounts & records"}
               </p>
             </div>
           </div>
