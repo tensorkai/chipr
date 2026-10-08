@@ -178,7 +178,7 @@ export default function Home() {
     <FinanceProvider>
       {showSplash && (
         <BrandLoadingScreen
-          minDuration={2600}
+          minDuration={450}
           onComplete={() => setShowSplash(false)}
         />
       )}
