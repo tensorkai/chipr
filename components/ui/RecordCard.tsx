@@ -1,11 +1,9 @@
 "use client";
 
 import React from "react";
-import { Transaction, ReimbursementStatus } from "@/types/finance";
+import { Transaction } from "@/types/finance";
 import { MoneyAmount } from "./MoneyAmount";
 import {
-  BankIcon,
-  CreditCardIcon,
   CoffeeIcon,
   LaptopIcon,
   BriefcaseIcon,
@@ -18,7 +16,6 @@ import {
   EditIcon,
   TrashIcon,
   CheckCircleIcon,
-  ArrowUpRightIcon,
   ArrowDownLeftIcon,
 } from "./Icons";
 
@@ -49,7 +46,6 @@ export function RecordCard({
     category,
     date,
     amount,
-    entity = "personal",
     isTaxDeductible = false,
     deductiblePercentage,
     scheduleCCategory,
@@ -144,8 +140,16 @@ export function RecordCard({
   if (variant === "compact") {
     return (
       <div
-        onClick={() => onClick?.(transaction)}
-        className={`group relative flex items-center justify-between p-3 rounded-xl border border-border-subtle bg-surface hover:bg-canvas hover:border-border-strong transition-all duration-150 cursor-pointer shadow-xs ${className}`}
+        role={onClick || onEdit ? "button" : undefined}
+        tabIndex={onClick || onEdit ? 0 : undefined}
+        onKeyDown={event => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            (onClick || onEdit)?.(transaction);
+          }
+        }}
+        onClick={() => (onClick || onEdit)?.(transaction)}
+        className={`record-compact group relative flex items-center justify-between p-3 rounded-xl border border-border-subtle bg-surface hover:bg-canvas hover:border-border-strong transition-all duration-150 cursor-pointer shadow-xs ${className}`}
       >
         <div className="flex items-center gap-3 min-w-0">
           <div
@@ -168,6 +172,7 @@ export function RecordCard({
         <div className="text-right shrink-0 pl-2">
           <MoneyAmount
             amount={amount}
+            currency={transaction.currency}
             showSign
             colored
             privacyMask={privacyMask}

@@ -16,7 +16,7 @@ export function AccountModal({
   onClose,
   editingAccount,
 }: AccountModalProps) {
-  const { addAccount, updateAccount, deleteAccount, settings } = useFinance();
+  const { addAccount, updateAccount, deleteAccount, settings, workspace } = useFinance();
 
   const [name, setName] = useState("");
   const [type, setType] = useState<AccountType>("checking");
@@ -60,7 +60,7 @@ export function AccountModal({
       addAccount({
         name: name.trim(),
         type,
-        entity: "business",
+        entity: workspace,
         balance: parsedBalance,
         institution: institution.trim() || "Financial Institution",
         accountNumberMasked: accountNumberMasked.trim() || "••••",
@@ -92,7 +92,7 @@ export function AccountModal({
               {editingAccount ? "Edit Financial Account" : "Add Financial Account"}
             </h3>
             <p className="text-xs text-text-muted">
-              Connect or manually record checking, savings, card, or loan accounts
+              {editingAccount?.entity || workspace} account ? Checking, savings, credit or loans
             </p>
           </div>
           <button

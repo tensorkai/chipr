@@ -6,8 +6,8 @@ import { ArrowRightIcon } from "./Icons";
 
 /** Business-scope companion: links to an existing workflow without inferring financial advice. */
 export function ChiprCompanion() {
-  const { invoices, setActiveTab } = useFinance();
-  const overdueCount = invoices.filter((invoice) => invoice.status === "overdue").length;
+  const { invoices, setActiveTab, workspace } = useFinance();
+  const overdueCount = workspace === "personal" ? 0 : invoices.filter((invoice) => invoice.status === "overdue").length;
   return (
     <aside className="chipr-companion" aria-label="A note from Chipr">
       <MascotScene variant="perch" mood={overdueCount ? "alert" : "wave"} />
@@ -16,10 +16,10 @@ export function ChiprCompanion() {
         <h2>{overdueCount ? "A few loose ends to bring home." : "See the story behind the numbers."}</h2>
         <p>{overdueCount
           ? <><span className="font-mono tabular-nums">{overdueCount}</span> {overdueCount === 1 ? "business invoice is" : "business invoices are"} overdue. Take a look before planning your next move.</>
-          : "Your business reports bring income, expenses, and cash runway into one view."}</p>
+          : workspace === "personal" ? "Give your next goal a little room. See how your everyday spending fits into your budget." : "Your business reports bring income, expenses, and cash runway into one view."}</p>
       </div>
-      <button type="button" onClick={() => setActiveTab(overdueCount ? "invoices" : "reports")} className="chipr-companion-action">
-        {overdueCount ? "Review invoices" : "Explore reports"}<ArrowRightIcon className="h-4 w-4" />
+      <button type="button" onClick={() => setActiveTab(workspace === "personal" ? "budgets" : overdueCount ? "invoices" : "reports")} className="chipr-companion-action">
+        {workspace === "personal" ? "Explore budgets" : overdueCount ? "Review invoices" : "Explore reports"}<ArrowRightIcon className="h-4 w-4" />
       </button>
     </aside>
   );

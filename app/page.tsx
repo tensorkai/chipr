@@ -63,7 +63,7 @@ function MainContent() {
           type="button"
           onClick={() => setActiveTab("dashboard")}
           aria-current={activeTab === "dashboard" ? "page" : undefined}
-          className={`flex flex-col items-center justify-center flex-1 py-1 rounded-xl transition-all cursor-pointer min-h-[44px] ${
+          className={`flex flex-col items-center justify-center flex-1 py-1 rounded-xl transition-all cursor-pointer min-h-11 ${
             activeTab === "dashboard"
               ? "text-brand font-bold bg-brand/10 dark:bg-brand/20"
               : "text-text-muted hover:text-text-primary"
@@ -77,7 +77,7 @@ function MainContent() {
           type="button"
           onClick={() => setActiveTab("transactions")}
           aria-current={activeTab === "transactions" ? "page" : undefined}
-          className={`relative flex flex-col items-center justify-center flex-1 py-1 rounded-xl transition-all cursor-pointer min-h-[44px] ${
+          className={`relative flex flex-col items-center justify-center flex-1 py-1 rounded-xl transition-all cursor-pointer min-h-11 ${
             activeTab === "transactions"
               ? "text-brand font-bold bg-brand/10 dark:bg-brand/20"
               : "text-text-muted hover:text-text-primary"
@@ -96,7 +96,7 @@ function MainContent() {
           type="button"
           onClick={() => setActiveTab("invoices")}
           aria-current={activeTab === "invoices" ? "page" : undefined}
-          className={`relative flex flex-col items-center justify-center flex-1 py-1 rounded-xl transition-all cursor-pointer min-h-[44px] ${
+          className={`relative flex flex-col items-center justify-center flex-1 py-1 rounded-xl transition-all cursor-pointer min-h-11 ${
             activeTab === "invoices"
               ? "text-brand font-bold bg-brand/10 dark:bg-brand/20"
               : "text-text-muted hover:text-text-primary"
@@ -115,7 +115,7 @@ function MainContent() {
           type="button"
           onClick={() => setActiveTab("reports")}
           aria-current={activeTab === "reports" ? "page" : undefined}
-          className={`flex flex-col items-center justify-center flex-1 py-1 rounded-xl transition-all cursor-pointer min-h-[44px] ${
+          className={`flex flex-col items-center justify-center flex-1 py-1 rounded-xl transition-all cursor-pointer min-h-11 ${
             activeTab === "reports"
               ? "text-brand font-bold bg-brand/10 dark:bg-brand/20"
               : "text-text-muted hover:text-text-primary"
@@ -129,7 +129,7 @@ function MainContent() {
           type="button"
           onClick={() => setActiveTab("chat")}
           aria-current={activeTab === "chat" ? "page" : undefined}
-          className={`relative flex flex-col items-center justify-center flex-1 py-1 rounded-xl transition-all cursor-pointer min-h-[44px] ${
+          className={`relative flex flex-col items-center justify-center flex-1 py-1 rounded-xl transition-all cursor-pointer min-h-11 ${
             activeTab === "chat"
               ? "text-brand font-bold bg-brand/10 dark:bg-brand/20"
               : "text-text-muted hover:text-text-primary"
@@ -178,7 +178,7 @@ export default function Home() {
     <FinanceProvider>
       {showSplash && (
         <BrandLoadingScreen
-          minDuration={2600}
+          minDuration={450}
           onComplete={() => setShowSplash(false)}
         />
       )}

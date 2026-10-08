@@ -13,7 +13,6 @@ import {
   EditIcon,
   CopyIcon,
   CheckIcon,
-  ArrowUpRightIcon,
   CreditPlusIcon,
 } from "./Icons";
 
@@ -61,7 +60,7 @@ export function BalanceCard({
           label: "Savings / HYSA",
           accentBg: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
           cardGradient: "from-emerald-500/[0.04] via-transparent to-transparent",
-          chip: "APY 4.75% High Yield",
+          chip: "Savings reserve",
           chipColor: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300",
         };
       case "investment":

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useMemo, useEffect, useRef } from "react";
+import React, { createContext, useContext, useState, useMemo, useEffect, useRef, useSyncExternalStore, useEffectEvent } from "react";
 import {
   WorkspaceEntity,
   FinancialAccount,
@@ -14,10 +14,13 @@ import {
   InvoiceLineItem,
   UserSettings,
 } from "@/types/finance";
+import { calculateBudgets } from "@/lib/finance/budgets";
+import { calculateMetrics } from "@/lib/finance/metrics";
 import { ChatMessage } from "@/types/chat";
 import { getDemoDataset } from "@/data/demoData";
 import { resolveCategory } from "@/lib/categories";
-import { AUTHORIZED_USER, AUTH_STORAGE_KEY } from "@/lib/auth";
+import { DEFAULT_SETTINGS, STORAGE_KEYS, readFinanceSnapshot } from "./finance-storage";
+import { mergeRecords, mergeBudgetRecords } from "@/lib/finance/merge";
 
 export type NavigationTab =
   | "dashboard"
@@ -129,30 +132,21 @@ interface FinanceContextType {
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
 
-const STORAGE_KEYS = {
-  ACCOUNTS: "chipr_accounts_v2",
-  TRANSACTIONS: "chipr_transactions_v2",
-  INVOICES: "chipr_invoices_v2",
-  BUDGETS: "chipr_budgets_v2",
-  VENDOR_BILLS: "chipr_vendor_bills_v2",
-  SUBSCRIPTIONS: "chipr_subscriptions_v2",
-  SETTINGS: "chipr_settings_v2",
-  WORKSPACE: "chipr_workspace_v2",
-  DARK_MODE: "chipr_dark_mode_v2",
-  PRIVACY: "chipr_privacy_mask_v2",
-  CHAT_MESSAGES: "chipr_chat_messages_v1",
-  DISMISSED_BUDGETS: "chipr_dismissed_budgets_v2",
-  AUTH: AUTH_STORAGE_KEY,
-};
-
-const DEFAULT_BUDGET_ENVELOPES: BudgetEnvelope[] = [];
+const subscribeToClient = () => () => {};
+const clientSnapshot = () => true;
+const serverSnapshot = () => false;
 
 export function FinanceProvider({ children }: { children: React.ReactNode }) {
-  const [isHydrated, setIsHydrated] = useState(false);
+  const ready = useSyncExternalStore(subscribeToClient, clientSnapshot, serverSnapshot);
+  return ready ? <FinanceStateProvider>{children}</FinanceStateProvider> : null;
+}
 
-  const [workspace, setWorkspaceState] = useState<WorkspaceEntity>("business");
-  const [privacyMask, setPrivacyMaskState] = useState<boolean>(false);
-  const [darkMode, setDarkModeState] = useState<boolean>(false);
+function FinanceStateProvider({ children }: { children: React.ReactNode }) {
+  const [initial] = useState(readFinanceSnapshot);
+
+  const [workspace, setWorkspaceState] = useState<WorkspaceEntity>(initial.workspace);
+  const [privacyMask, setPrivacyMaskState] = useState<boolean>(initial.privacyMask);
+  const [darkMode, setDarkModeState] = useState<boolean>(initial.darkMode);
   const [activeTab, setActiveTab] = useState<NavigationTab>("dashboard");
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState<boolean>(false);
   const toggleMobileSidebar = () => setMobileSidebarOpen((prev) => !prev);
@@ -169,200 +163,80 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const [settings, setSettings] = useState<UserSettings>({
-    personalName: "",
-    businessName: "",
-    email: "",
-    phone: "",
-    role: "",
-    businessType: "Sole Proprietorship",
-    taxIdMasked: "",
-    currency: "PHP",
-    fiscalYearStart: "January",
-    defaultWorkspace: "business",
-    defaultPrivacyMask: false,
-  });
+  const [settings, setSettings] = useState<UserSettings>(initial.settings);
 
   // State initialized completely empty - zero predefined dummy values
-  const [accounts, setAccounts] = useState<FinancialAccount[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [rawBudgets, setRawBudgets] = useState<BudgetEnvelope[]>([]);
-  const [dismissedBudgetCategories, setDismissedBudgetCategories] = useState<string[]>([]);
-  const [vendorBills, setVendorBills] = useState<VendorBill[]>([]);
-  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [accounts, setAccounts] = useState<FinancialAccount[]>(initial.accounts);
+  const [transactions, setTransactions] = useState<Transaction[]>(initial.transactions);
+  const [invoices, setInvoices] = useState<Invoice[]>(initial.invoices);
+  const [rawBudgets, setRawBudgets] = useState<BudgetEnvelope[]>(initial.rawBudgets);
+  const [dismissedBudgetCategories, setDismissedBudgetCategories] = useState<string[]>(initial.dismissedBudgetCategories);
+  const [vendorBills, setVendorBills] = useState<VendorBill[]>(initial.vendorBills);
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>(initial.subscriptions);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(initial.chatMessages);
   const isExplicitClearRef = useRef<boolean>(false);
+  const hasSyncedServerRef = useRef(false);
 
   // Add Credit modal states
   const [isAddCreditModalOpen, setIsAddCreditModalOpen] = useState<boolean>(false);
   const [addCreditTargetAccount, setAddCreditTargetAccount] = useState<FinancialAccount | null>(null);
 
   // Exclusive authentication states (Benedict Fusin)
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(Boolean(initial.user));
   const [isAuthChecking, setIsAuthChecking] = useState<boolean>(true);
   const [currentUser, setCurrentUser] = useState<{
     email: string;
     name: string;
     role?: string;
-  } | null>(null);
+  } | null>(initial.user);
 
   // Dynamically compute budget envelopes and live spent amounts from transactions
-  const budgets: BudgetEnvelope[] = useMemo(() => {
-    const currentMonthPrefix = new Date().toISOString().slice(0, 7);
+  const budgets = useMemo(() => calculateBudgets(rawBudgets, transactions, dismissedBudgetCategories), [rawBudgets, transactions, dismissedBudgetCategories]);
 
-    // 1. Group all personal outflow spending by category
-    const spentByCategory = new Map<string, { spent: number; properName: string }>();
-    transactions.forEach((t) => {
-      if (t.entity !== "personal" || t.amount >= 0) return;
-      const tDate = t.date || "";
-      const isCurrentMonth = tDate.startsWith(currentMonthPrefix) || !tDate;
-      if (!isCurrentMonth) return;
-
-      const catKey = (t.category || "Others & Miscellaneous").toLowerCase().trim();
-      const current = spentByCategory.get(catKey) || { spent: 0, properName: t.category };
-      current.spent += Math.abs(t.amount);
-      spentByCategory.set(catKey, current);
+  const mergeServerData = useEffectEvent((data: {
+    accounts?: FinancialAccount[]; transactions?: Transaction[];
+    budgets?: BudgetEnvelope[]; invoices?: Invoice[]; settings?: Partial<UserSettings>;
+  }) => {
+    if (isExplicitClearRef.current) return;
+    const persistMissing = (path: string, records: unknown[]) => records.forEach(record => {
+      fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(record) }).catch(() => {});
     });
-
-    // 2. Map all explicit user-created budget envelopes
-    const userEnvelopeCategories = new Set<string>();
-    const list: BudgetEnvelope[] = rawBudgets.map((b) => {
-      const bCat = b.category.toLowerCase().trim();
-      userEnvelopeCategories.add(bCat);
-      const spentEntry = spentByCategory.get(bCat);
-      let totalSpent = spentEntry ? spentEntry.spent : 0;
-      if (!totalSpent) {
-        for (const [k, v] of spentByCategory.entries()) {
-          if (k.includes(bCat) || bCat.includes(k)) {
-            totalSpent += v.spent;
-          }
-        }
-      }
-      return {
-        ...b,
-        spent: totalSpent,
-      };
-    });
-
-    const dismissedSet = new Set(
-      dismissedBudgetCategories.map((c) => c.toLowerCase().trim())
-    );
-
-    // 3. Automatically include any personal category that has recorded spending
-    // unless the user explicitly deleted / dismissed that envelope
-    for (const [catKey, { spent, properName }] of spentByCategory.entries()) {
-      let isCovered = userEnvelopeCategories.has(catKey);
-      if (!isCovered) {
-        for (const userCat of userEnvelopeCategories) {
-          if (userCat.includes(catKey) || catKey.includes(userCat)) {
-            isCovered = true;
-            break;
-          }
-        }
-      }
-      if (!isCovered && !dismissedSet.has(catKey) && spent > 0) {
-        list.push({
-          id: `b-auto-${catKey.replace(/[^a-z0-9]/g, "-")}`,
-          category: properName,
-          monthlyLimit: 0, // 0 indicates no limit established yet
-          spent,
-          entity: "personal",
-        });
-      }
+    if (Array.isArray(data.accounts)) {
+      const { records, missing } = mergeRecords(accounts, data.accounts);
+      setAccounts(records);
+      persistMissing("/api/accounts", missing);
     }
-
-    return list;
-  }, [rawBudgets, transactions, dismissedBudgetCategories]);
+    if (Array.isArray(data.transactions)) {
+      const { records, missing } = mergeRecords(transactions, data.transactions);
+      setTransactions(records.sort((a, b) => (b.date || "").localeCompare(a.date || "")));
+      persistMissing("/api/transactions", missing);
+    }
+    if (Array.isArray(data.invoices)) {
+      const { records, missing } = mergeRecords(invoices, data.invoices);
+      setInvoices(records.sort((a, b) => (b.issueDate || "").localeCompare(a.issueDate || "")));
+      persistMissing("/api/invoices", missing);
+    }
+    if (Array.isArray(data.budgets)) {
+      const { records, missing } = mergeBudgetRecords(rawBudgets, data.budgets);
+      setRawBudgets(records);
+      persistMissing("/api/budgets", missing.map(({ id, category, monthlyLimit }) => ({ id, category, monthlyLimit })));
+    }
+    if (data.settings && (data.settings.personalName || data.settings.businessName || data.settings.currency)) {
+      setSettings({ ...settings, ...data.settings,
+        personalName: data.settings.personalName || settings.personalName,
+        businessName: data.settings.businessName || settings.businessName,
+        currency: data.settings.currency || settings.currency || "PHP",
+      });
+    }
+  });
 
   // Synchronous client-mount hydration from localStorage and live SQLite sync
   useEffect(() => {
-    try {
-      const storedAccounts = localStorage.getItem(STORAGE_KEYS.ACCOUNTS);
-      const storedTxs = localStorage.getItem(STORAGE_KEYS.TRANSACTIONS);
-      const storedInvoices = localStorage.getItem(STORAGE_KEYS.INVOICES);
-      const storedBudgets = localStorage.getItem(STORAGE_KEYS.BUDGETS);
-      const storedVendorBills = localStorage.getItem(STORAGE_KEYS.VENDOR_BILLS);
-      const storedSubs = localStorage.getItem(STORAGE_KEYS.SUBSCRIPTIONS);
-      const storedChat = localStorage.getItem(STORAGE_KEYS.CHAT_MESSAGES);
-      const storedSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-      const storedWs = localStorage.getItem(STORAGE_KEYS.WORKSPACE);
-      const storedDark = localStorage.getItem(STORAGE_KEYS.DARK_MODE);
-      const storedPrivacy = localStorage.getItem(STORAGE_KEYS.PRIVACY);
-
-      if (storedAccounts) {
-        const parsed = JSON.parse(storedAccounts);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          parsed.forEach((a: FinancialAccount) => {
-            if (a.currency === "USD" || !a.currency) a.currency = "PHP";
-          });
-          setAccounts(parsed);
-        }
-      }
-      if (storedTxs) {
-        const parsed = JSON.parse(storedTxs);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          parsed.forEach((t: Transaction) => {
-            if (t.currency === "USD" || !t.currency) t.currency = "PHP";
-          });
-          setTransactions(parsed);
-        }
-      }
-      if (storedInvoices) {
-        const parsed = JSON.parse(storedInvoices);
-        if (Array.isArray(parsed) && parsed.length > 0) setInvoices(parsed);
-      }
-      if (storedBudgets) {
-        try {
-          const parsed = JSON.parse(storedBudgets);
-          if (Array.isArray(parsed) && parsed.length > 0) setRawBudgets(parsed);
-        } catch {}
-      }
-      const storedDismissed = localStorage.getItem(STORAGE_KEYS.DISMISSED_BUDGETS);
-      if (storedDismissed) {
-        try {
-          const parsed = JSON.parse(storedDismissed);
-          if (Array.isArray(parsed)) setDismissedBudgetCategories(parsed);
-        } catch {}
-      }
-      if (storedVendorBills) setVendorBills(JSON.parse(storedVendorBills));
-      if (storedSubs) setSubscriptions(JSON.parse(storedSubs));
-      if (storedChat) setChatMessages(JSON.parse(storedChat));
-      if (storedSettings) {
-        const parsed = JSON.parse(storedSettings);
-        if (!parsed.currency || parsed.currency === "USD") {
-          parsed.currency = "PHP";
-        }
-        setSettings(parsed);
-      }
-      if (storedWs) {
-        setWorkspaceState(storedWs === "personal" ? "business" : (storedWs as WorkspaceEntity));
-      }
-      if (storedDark) {
-        const isDark = JSON.parse(storedDark);
-        setDarkModeState(isDark);
-        if (isDark) document.documentElement.classList.add("dark");
-      }
-      if (storedPrivacy) setPrivacyMaskState(JSON.parse(storedPrivacy));
-      const storedAuth = localStorage.getItem(STORAGE_KEYS.AUTH);
-      if (storedAuth) {
-        try {
-          const parsedAuth = JSON.parse(storedAuth);
-          if (
-            parsedAuth &&
-            parsedAuth.email &&
-            parsedAuth.email.toLowerCase() === AUTHORIZED_USER.email.toLowerCase()
-          ) {
-            setIsAuthenticated(true);
-            setCurrentUser(parsedAuth);
-          }
-        } catch {}
-      }
-    } catch {
-      // Ignore storage read errors
-    } finally {
-      setIsHydrated(true);
-    }
+    // React Strict Mode intentionally replays effects in development. Network
+    // hydration is a one-shot adapter, so duplicate requests would duplicate
+    // offline uploads and make the merge appear non-deterministic.
+    if (hasSyncedServerRef.current) return;
+    hasSyncedServerRef.current = true;
 
     // Verify session with authentication API
     fetch("/api/auth/session")
@@ -390,182 +264,24 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     // Hydrate directly from SQLite database API with smart bidirectional merge
     fetch("/api/data")
       .then((res) => res.json())
-      .then((data) => {
-        if (data && data.status === "ok") {
-          // 1. Accounts bidirectional merge
-          if (Array.isArray(data.accounts)) {
-            setAccounts((prevAccounts) => {
-              if (data.accounts.length === 0 && prevAccounts.length === 0) {
-                return [];
-              }
-              const serverMap = new Map(data.accounts.map((a: FinancialAccount) => [a.id, a]));
-              const merged: FinancialAccount[] = [...data.accounts];
-              const missingOnServer: FinancialAccount[] = [];
-
-              for (const clientAcc of prevAccounts) {
-                if (!serverMap.has(clientAcc.id)) {
-                  merged.push(clientAcc);
-                  missingOnServer.push(clientAcc);
-                }
-              }
-
-              // Sync any missing accounts back to SQLite in background
-              missingOnServer.forEach((acc) => {
-                fetch("/api/accounts", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify(acc),
-                }).catch(() => {});
-              });
-
-              return merged;
-            });
-          }
-
-          // 2. Transactions bidirectional merge
-          if (Array.isArray(data.transactions)) {
-            setTransactions((prevTxs) => {
-              if (data.transactions.length === 0 && prevTxs.length === 0) {
-                return [];
-              }
-              const serverMap = new Map(data.transactions.map((t: Transaction) => [t.id, t]));
-              const merged: Transaction[] = [...data.transactions];
-              const missingOnServer: Transaction[] = [];
-
-              for (const clientTx of prevTxs) {
-                if (!serverMap.has(clientTx.id)) {
-                  merged.push(clientTx);
-                  missingOnServer.push(clientTx);
-                }
-              }
-
-              missingOnServer.forEach((tx) => {
-                fetch("/api/transactions", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify(tx),
-                }).catch(() => {});
-              });
-
-              merged.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
-              return merged;
-            });
-          }
-
-          // 3. Budgets merge (filter out auto-budgets from rawBudgets)
-          if (Array.isArray(data.budgets)) {
-            setRawBudgets((prevBudgets) => {
-              const serverBudgets = data.budgets.filter(
-                (b: BudgetEnvelope) => !b.id.startsWith("b-auto-")
-              );
-              const serverCatMap = new Map(
-                serverBudgets.map((b: BudgetEnvelope) => [b.category.toLowerCase().trim(), b])
-              );
-              const merged: BudgetEnvelope[] = [...serverBudgets];
-              const missingOnServer: BudgetEnvelope[] = [];
-
-              for (const clientB of prevBudgets) {
-                if (clientB.id.startsWith("b-auto-")) continue;
-                const catKey = clientB.category.toLowerCase().trim();
-                if (!serverCatMap.has(catKey)) {
-                  merged.push(clientB);
-                  missingOnServer.push(clientB);
-                }
-              }
-
-              missingOnServer.forEach((b) => {
-                fetch("/api/budgets", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ category: b.category, monthlyLimit: b.monthlyLimit, id: b.id }),
-                }).catch(() => {});
-              });
-
-              return merged;
-            });
-          }
-
-          // 4. Invoices bidirectional merge
-          if (Array.isArray(data.invoices)) {
-            setInvoices((prevInvoices) => {
-              if (data.invoices.length === 0 && prevInvoices.length === 0) {
-                return [];
-              }
-              const serverMap = new Map(data.invoices.map((i: Invoice) => [i.id, i]));
-              const merged: Invoice[] = [...data.invoices];
-              const missingOnServer: Invoice[] = [];
-
-              for (const clientInv of prevInvoices) {
-                if (!serverMap.has(clientInv.id)) {
-                  merged.push(clientInv);
-                  missingOnServer.push(clientInv);
-                }
-              }
-
-              missingOnServer.forEach((inv) => {
-                fetch("/api/invoices", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify(inv),
-                }).catch(() => {});
-              });
-
-              merged.sort((a, b) => (b.issueDate || "").localeCompare(a.issueDate || ""));
-              return merged;
-            });
-          }
-
-          // 5. Settings merge
-          if (data.settings && (data.settings.personalName || data.settings.businessName || data.settings.currency)) {
-            setSettings((prev) => ({
-              ...prev,
-              ...data.settings,
-              personalName: data.settings.personalName || prev.personalName,
-              businessName: data.settings.businessName || prev.businessName,
-              currency: data.settings.currency || prev.currency || "PHP",
-            }));
-          }
-        }
-      })
+      .then((data) => { if (data?.status === "ok") mergeServerData(data); })
       .catch((err) => {
         console.warn("[FinanceContext] SQLite data sync:", err);
       });
   }, []);
 
-  // Save to localStorage whenever state updates, guarded against race conditions
+  // Persist complete snapshots, including deletion of the last record.
   useEffect(() => {
-    if (!isHydrated) return;
-    if (isExplicitClearRef.current) return;
-
-    try {
-      if (accounts.length > 0 || !localStorage.getItem(STORAGE_KEYS.ACCOUNTS)) {
-        localStorage.setItem(STORAGE_KEYS.ACCOUNTS, JSON.stringify(accounts));
-      }
-      if (transactions.length > 0 || !localStorage.getItem(STORAGE_KEYS.TRANSACTIONS)) {
-        localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(transactions));
-      }
-      if (invoices.length > 0 || !localStorage.getItem(STORAGE_KEYS.INVOICES)) {
-        localStorage.setItem(STORAGE_KEYS.INVOICES, JSON.stringify(invoices));
-      }
-      if (rawBudgets.length > 0 || !localStorage.getItem(STORAGE_KEYS.BUDGETS)) {
-        localStorage.setItem(STORAGE_KEYS.BUDGETS, JSON.stringify(rawBudgets));
-      }
-      if (vendorBills.length > 0 || !localStorage.getItem(STORAGE_KEYS.VENDOR_BILLS)) {
-        localStorage.setItem(STORAGE_KEYS.VENDOR_BILLS, JSON.stringify(vendorBills));
-      }
-      if (subscriptions.length > 0 || !localStorage.getItem(STORAGE_KEYS.SUBSCRIPTIONS)) {
-        localStorage.setItem(STORAGE_KEYS.SUBSCRIPTIONS, JSON.stringify(subscriptions));
-      }
-      if (chatMessages.length > 0 || !localStorage.getItem(STORAGE_KEYS.CHAT_MESSAGES)) {
-        localStorage.setItem(STORAGE_KEYS.CHAT_MESSAGES, JSON.stringify(chatMessages));
-      }
-      if (settings.personalName || settings.businessName || !localStorage.getItem(STORAGE_KEYS.SETTINGS)) {
-        localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
-      }
-    } catch {
-      // Storage quota or disabled
+    const entries = [
+      [STORAGE_KEYS.ACCOUNTS, accounts], [STORAGE_KEYS.TRANSACTIONS, transactions],
+      [STORAGE_KEYS.INVOICES, invoices], [STORAGE_KEYS.BUDGETS, rawBudgets],
+      [STORAGE_KEYS.VENDOR_BILLS, vendorBills], [STORAGE_KEYS.SUBSCRIPTIONS, subscriptions],
+      [STORAGE_KEYS.CHAT_MESSAGES, chatMessages], [STORAGE_KEYS.SETTINGS, settings],
+    ] as const;
+    for (const [key, value] of entries) {
+      try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* Storage disabled or full. */ }
     }
-  }, [accounts, transactions, invoices, rawBudgets, vendorBills, subscriptions, chatMessages, settings, isHydrated]);
+  }, [accounts, transactions, invoices, rawBudgets, vendorBills, subscriptions, chatMessages, settings]);
 
   // Sync dark mode
   useEffect(() => {
@@ -574,10 +290,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     } else {
       document.documentElement.classList.remove("dark");
     }
-    if (isHydrated) {
-      localStorage.setItem(STORAGE_KEYS.DARK_MODE, JSON.stringify(darkMode));
-    }
-  }, [darkMode, isHydrated]);
+    localStorage.setItem(STORAGE_KEYS.DARK_MODE, JSON.stringify(darkMode));
+  }, [darkMode]);
 
   const togglePrivacyMask = () => {
     setPrivacyMaskState((prev) => {
@@ -606,144 +320,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Dynamically computed financial metrics (Zero hardcoded constants!)
-  const metrics: FinancialMetrics = useMemo(() => {
-    // 1. Personal calculation
-    const personalAccounts = accounts.filter((a) => a.entity === "personal");
-    const totalAssets = accounts
-      .filter((a) => a.balance > 0)
-      .reduce((sum, a) => sum + a.balance, 0);
-    const totalLiabilities = accounts
-      .filter((a) => a.balance < 0)
-      .reduce((sum, a) => sum + Math.abs(a.balance), 0);
-    const netWorth = totalAssets - totalLiabilities;
-
-    const totalInflow = transactions
-      .filter((t) => t.amount > 0)
-      .reduce((sum, t) => sum + t.amount, 0);
-    const totalOutflow = transactions
-      .filter((t) => t.amount < 0)
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-    const savingsRate =
-      totalInflow > 0
-        ? Math.max(0, ((totalInflow - totalOutflow) / totalInflow) * 100)
-        : 0;
-
-    // 2. Business calculation
-    const businessLiquidCash = accounts
-      .filter((a) => a.type === "checking" || a.type === "savings")
-      .reduce((sum, a) => sum + Math.max(0, a.balance), 0);
-    const businessAssets = totalAssets;
-    const businessLiabilities = totalLiabilities;
-    const businessEquity = netWorth;
-
-    const businessTxs = transactions;
-    const grossRevenue = businessTxs
-      .filter((t) => t.amount > 0)
-      .reduce((sum, t) => sum + t.amount, 0);
-
-    const cogsTxs = businessTxs.filter(
-      (t) => t.scheduleCCategory === "Contract Labor (1099)" && t.amount < 0
-    );
-    const cogs = cogsTxs.reduce((sum, t) => sum + Math.abs(t.amount), 0);
-
-    const opexTxs = businessTxs.filter(
-      (t) =>
-        t.amount < 0 &&
-        t.scheduleCCategory !== "Contract Labor (1099)" &&
-        !t.isOwnerDraw
-    );
-    const operatingExpenses = opexTxs.reduce(
-      (sum, t) => sum + Math.abs(t.amount),
-      0
-    );
-
-    const grossProfit = grossRevenue - cogs;
-    const netOperatingIncome = grossProfit - operatingExpenses;
-    const netMargin =
-      grossRevenue > 0 ? (netOperatingIncome / grossRevenue) * 100 : 0;
-
-    // Invoices & Receivables
-    const outstandingReceivables = invoices
-      .filter((i) => i.status === "sent" || i.status === "overdue")
-      .reduce((sum, i) => sum + i.total, 0);
-
-    const overdueReceivables = invoices
-      .filter((i) => i.status === "overdue")
-      .reduce((sum, i) => sum + i.total, 0);
-
-    // Business runway & burn rate
-    const monthlyBurnRate = cogs + operatingExpenses;
-    const cashRunwayMonths =
-      monthlyBurnRate > 0
-        ? Number((businessLiquidCash / monthlyBurnRate).toFixed(1))
-        : businessLiquidCash > 0
-        ? 99.0
-        : 0;
-
-    // Tax deductions (Schedule C)
-    const taxDeductibleTotal = businessTxs
-      .filter((t) => t.isTaxDeductible && t.amount < 0)
-      .reduce((sum, t) => {
-        const pct = (t.deductiblePercentage ?? 100) / 100;
-        return sum + Math.abs(t.amount) * pct;
-      }, 0);
-
-    const estimatedTaxSavings = taxDeductibleTotal * 0.25;
-
-    // Unified Portfolio
-    const personalLiquidCash = personalAccounts
-      .filter((a) => a.type === "checking" || a.type === "savings")
-      .reduce((sum, a) => sum + Math.max(0, a.balance), 0);
-    const totalLiquidCash = personalLiquidCash + businessLiquidCash;
-    const totalNetWorth = netWorth + businessEquity;
-
-    // Dynamic Growth Indicators
-    const revenueGrowthPct = grossRevenue > 0 ? 12.5 : undefined;
-    const netWorthGrowthPct = totalNetWorth !== 0 ? 5.2 : undefined;
-
-    // Anti-commingling & Reimbursements
-    const pendingReimbursements = transactions
-      .filter((t) => t.reimbursementStatus === "pending")
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-
-    const totalOwnerDraws = businessTxs
-      .filter((t) => t.isOwnerDraw)
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-
-    const totalCapitalContributions = businessTxs
-      .filter((t) => t.isCapitalContribution)
-      .reduce((sum, t) => sum + t.amount, 0);
-
-    return {
-      netWorth,
-      totalAssets,
-      totalLiabilities,
-      personalMonthlyInflow: totalInflow,
-      personalMonthlyOutflow: totalOutflow,
-      savingsRate,
-      grossRevenue,
-      cogs,
-      grossProfit,
-      operatingExpenses,
-      netOperatingIncome,
-      netMargin,
-      cashRunwayMonths,
-      monthlyBurnRate,
-      outstandingReceivables,
-      overdueReceivables,
-      taxDeductibleTotal,
-      estimatedTaxSavings,
-      businessLiquidCash,
-      businessEquity,
-      totalLiquidCash,
-      totalNetWorth,
-      revenueGrowthPct,
-      netWorthGrowthPct,
-      pendingReimbursements,
-      totalOwnerDraws,
-      totalCapitalContributions,
-    };
-  }, [accounts, transactions, invoices]);
+  const metrics = useMemo(() => calculateMetrics(accounts, transactions, invoices), [accounts, transactions, invoices]);
 
   // -------------------------------------------------------------
   // Account Actions
@@ -1196,19 +773,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     setVendorBills([]);
     setSubscriptions([]);
     setChatMessages([]);
-    setSettings({
-      personalName: "",
-      businessName: "",
-      email: "",
-      phone: "",
-      role: "",
-      businessType: "Sole Proprietorship",
-      taxIdMasked: "",
-      currency: "PHP",
-      fiscalYearStart: "January",
-      defaultWorkspace: "business",
-      defaultPrivacyMask: false,
-    });
+    setSettings({ ...DEFAULT_SETTINGS });
     localStorage.removeItem(STORAGE_KEYS.ACCOUNTS);
     localStorage.removeItem(STORAGE_KEYS.TRANSACTIONS);
     localStorage.removeItem(STORAGE_KEYS.INVOICES);
