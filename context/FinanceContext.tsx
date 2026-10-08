@@ -336,7 +336,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         setSettings(parsed);
       }
       if (storedWs) {
-        setWorkspaceState(storedWs === "personal" ? "business" : (storedWs as WorkspaceEntity));
+        setWorkspaceState(storedWs === "personal" ? "personal" : "business");
       }
       if (storedDark) {
         const isDark = JSON.parse(storedDark);
