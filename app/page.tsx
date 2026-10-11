@@ -1,5 +1,4 @@
 "use client";
-
 import React from "react";
 import { FinanceProvider, useFinance } from "@/context/FinanceContext";
 import { ChiprAssistantDock } from "@/components/ui/ChiprAssistantDock";
